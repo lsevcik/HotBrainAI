@@ -4,24 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Survey</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+
 </head>
 <body>
     <style>
-        div{
+        #survey div{
             width: 50%;
-            margin: auto;
-            height: auto;
+            bottom: center;
+            right: center;
         }
     </style>
-    <div> 
+
+    <div id="main">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="matches.html">Matches</a></li>
+            <li><a href="movie.html">Movie</a></li>
+            <li><a class="active" href="survey.html">Survey</a></li>
+        </ul>
+    </div>
+
+    <div id="survey"> 
         <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdfk2gKgDZG7hSDVph8pX_c89HgFqAiWNTK_hfnvx9U0kFJXw/viewform?embedded=true" width="640" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
     </div>
-
-    <div>
-        <b><a href="movie.html" target="">movie link</a></b>
-    </div>
-
-    
 
 </body>
 </html>
