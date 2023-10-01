@@ -20,3 +20,21 @@
 
 #main .active {
    background-color: #04AA6D;}
+
+div.movie {
+   position: relative;
+}
+
+#movie {
+   display: grid;
+   justify-items: center;
+   align-items: center;
+   margin-top: 100px;
+}
+
+#button {
+   display: grid;
+   justify-items: center;
+   align-items: center;
+   margin-top: 100px;
+}
