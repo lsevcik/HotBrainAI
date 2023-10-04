@@ -6,25 +6,23 @@ from tools.db_con import get_db_instance
 from tools.logging import logger
 
 def handle_request():
-    logger.debug("Login Handle Request")
-    #use data here to auth the user
-
+    # User submits form without username or password
     if not request.form['username'] and not request.form['password']:
         return json_response(status_ = 400, message = "Bad request", authenticated = False)
 
-    db,cur = get_db_instance()
-
+    db, cur = get_db_instance()
     cur.execute("SELECT * FROM Users WHERE Username = %s", (request.form['username'],))
-    if cur.rowcount != 1:
+    if cur.rowcount != 1: # User enters a username that doesn't exist
         return json_response(status_=401, message = 'Invalid credentials', authenticated =  False )
-
-    user = cur.fetchone();
+    user_id, username = cur.fetchone();
 
     # TODO: Password Authentication
 
+    # Create JWT
     jwt = {
-            "sub" : request.form['username'] #sub is used by pyJwt as the owner of the token
-            }
+        "sub" : username
+    }
 
+    # Return JWT to authenticated user
     return json_response( token = create_token(jwt) , authenticated = True)
 
