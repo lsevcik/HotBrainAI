@@ -1,13 +1,10 @@
 import psycopg2
-import yaml
-import os
+from tools.config import get_config
 
 
 def get_db():
-    yml_configs = {}
-    with open(os.path.join(os.path.dirname(__file__), '..', 'config.yml')) as yml_file:
-        yml_configs = yaml.safe_load(yml_file)
-    return psycopg2.connect(host=yml_configs['database']['host'], dbname=yml_configs['database']['name'], user=yml_configs['database']['username'], password=yml_configs['database']['password'])
+    config = get_config()
+    return psycopg2.connect(host=config['database']['host'], dbname=config['database']['name'], user=config['database']['username'], password=config['database']['password'])
 
 def get_db_instance():  
     db  = get_db()
@@ -16,9 +13,7 @@ def get_db_instance():
     return db, cur
 
 if __name__ == "__main__":
-    yml_configs = {}
-    with open(os.path.join(os.path.dirname(__file__), '..', 'config.yml')) as yml_file:
-        yml_configs = yaml.safe_load(yml_file)
+    config = get_config()
     db, cur = get_db_instance()
 
     cur.execute("DROP TABLE IF EXISTS Users;")
