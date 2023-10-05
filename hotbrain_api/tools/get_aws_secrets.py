@@ -3,9 +3,9 @@ import json
 import yaml
 import os
 
-yml_configs = {}
-with open(os.path.join(os.path.dirname(__file__), '..', 'config.yml')) as yml_file:
-    yml_configs = yaml.safe_load(yml_file)
+from flask import current_app, g
+
+from tools.config import get_config
 
 NO_AWS = True
 if NO_AWS == False:
@@ -22,8 +22,8 @@ def get_secrets():
     if len(SECRET_CACHE) !=0:
         return SECRET_CACHE
 
-    secret_name = yml_configs['secrets']['secret_name']
-    region_name = yml_configs['secrets']['region_name']
+    secret_name = current_app.config['secrets']['secret_name']
+    region_name = current_app.config['secrets']['region_name']
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
