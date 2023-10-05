@@ -38,7 +38,7 @@
 
             function get_books() {
                 //make secure call with the jwt
-                secure_get_with_token("/secure_api/get_books", {}, function (data) {
+                secure_get_with_token("/user_api/get_books", {}, function (data) {
                     console.log("got books");
                     console.log(data);
                     $('#buybook').show();
@@ -47,7 +47,7 @@
             }
             function buy_book(book_id) {
                 //make secure call with the jwt
-                secure_get_with_token("/secure_api/get_books", { "book_id": book_id }, function (data) { console.log("got books"); console.log(data) },
+                secure_get_with_token("/user_api/get_books", { "book_id": book_id }, function (data) { console.log("got books"); console.log(data) },
                     function (err) { console.log(err) });
             }
 

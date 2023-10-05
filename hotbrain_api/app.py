@@ -7,89 +7,70 @@ import datetime
 import bcrypt
 import traceback
 import yaml
+import logging
 
-
-from tools.db_con import get_db_instance, get_db
+from tools.db_con import get_db
 
 from tools.token_required import token_required
 from tools.get_aws_secrets import get_secrets
 from tools.session import start_session
 
-from tools.logging import logger
-
-ERROR_MSG = "Internal Server Error"
-
-# Create our app
 app = Flask(__name__)
 
 app.config.from_file("config.yml", load=yaml.safe_load)
+app.config["secrets"] = get_secrets()
+
+app.logger.setLevel(logging.DEBUG)
 
 app.secret_key = b"abc123"
 
-# Plugins
 FlaskJSON(app)
 
 
-# g is flask for a global var storage
-def init_new_env():
-    if "db" not in g:
-        g.db = get_db()
-
-    if "secrets" not in g:
-        g.secrets = get_secrets()
-
-
-# This gets executed by default by the browser if no page is specified
-# So.. we redirect to the endpoint we want to load the base page
-@app.route("/")  # endpoint
+@app.route("/")
 def index():
     return redirect("/static/index.html")
 
 
-@app.route("/secure_api/<proc_name>", methods=["GET", "POST"])
+@app.route("/user_api/<proc_name>", methods=["GET", "POST"])
 @token_required
 @start_session
 def exec_secure_proc(proc_name):
-    logger.debug(f"Secure Call to {proc_name}")
-
-    # setup the env
-    init_new_env()
-
-    # see if we can execute it..
-    resp = ""
     try:
-        fn = getattr(__import__("secure_calls." + proc_name), proc_name)
-        resp = fn.handle_request()
+        fn = getattr(__import__("user_calls." + proc_name), proc_name)
+        return fn.handle_request()
     except Exception as err:
         ex_data = str(Exception) + "\n"
         ex_data = ex_data + str(err) + "\n"
         ex_data = ex_data + traceback.format_exc()
-        logger.error(ex_data)
-        return json_response(status_=500, data=ERROR_MSG)
-
-    return resp
+        app.logger.error(ex_data)
+        return json_response(status_=500, data="Internal Server Error")
 
 
 @app.route("/open_api/<proc_name>", methods=["GET", "POST"])
-def exec_proc(proc_name):
-    logger.debug(f"Call to {proc_name}")
-
-    # setup the env
-    init_new_env()
-
-    # see if we can execute it..
-    resp = ""
+def exec_open_proc(proc_name):
     try:
         fn = getattr(__import__("open_calls." + proc_name), proc_name)
-        resp = fn.handle_request()
+        return fn.handle_request()
     except Exception as err:
         ex_data = str(Exception) + "\n"
         ex_data = ex_data + str(err) + "\n"
         ex_data = ex_data + traceback.format_exc()
-        logger.error(ex_data)
-        return json_response(status_=500, data=ERROR_MSG)
+        app.logger.error(ex_data)
+        return json_response(status_=500, data="Internal Server Error")
 
-    return resp
+
+@app.route("/scanner_api/<proc_name>", methods=["GET", "POST"])
+def exec_scanner_proc(proc_name):
+    try:
+        fn = getattr(__import__("open_calls." + proc_name), proc_name)
+        return fn.handle_request()
+    except Exception as err:
+        ex_data = str(Exception) + "\n"
+        ex_data = ex_data + str(err) + "\n"
+        ex_data = ex_data + traceback.format_exc()
+        app.logger.error(ex_data)
+        return json_response(status_=500, data="Internal Server Error")
 
 
 if __name__ == "__main__":
