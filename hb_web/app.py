@@ -31,17 +31,17 @@ def index():
 
 
 @app.route("/login")
-def index():
+def login():
     return render_template("login.html")
 
 
 @app.route("/survey")
-def index():
+def survey():
     return render_template("survey.html")
 
 
 @app.route("/matches")
-def index():
+def matches():
     return render_template("matches.html")
 
 

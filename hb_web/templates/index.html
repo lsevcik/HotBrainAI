@@ -4,21 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hot Brain</title>
-    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
 
     <style>
         body {
-          background-color: rgb(185, 178, 185);
-            /**/
+            background-color: rgb(185, 178, 185);
         }
 
         h1 {
             font-size: 40px;
-            font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-            text-align: center;}
-        h2{
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            text-align: center;
+        }
+
+        h2 {
             font-size: 28px;
-            text-align: center;}
+            text-align: center;
+        }
     </style>
 
 </head>
@@ -26,9 +28,8 @@
     <div id="main">
         <ul>
             <li><a class="active" href="index.html">Home</a></li>
-            <li><a href="matches.html">Matches</a></li>
-            <li><a href="movie.html">Movie</a></li>
-            <li><a href="survey.html">Survey</a></li>
+            <li><a href="{{ url_for('matches') }}">Matches</a></li>
+            <li><a href="{{ url_for('survey') }}">Survey</a></li>
         </ul>
     </div>
 
@@ -38,10 +39,10 @@
 
     <p>
         <h2>
-            Calm your mind.</br>
-            Relax your thoughts.</br>
-            React naturally.</br>
-            <b><a href="survey.html" target="">survey link</a></b>
+            Calm your mind.<br/>
+            Relax your thoughts.<br/>
+            React naturally.<br/>
+            <b><a href="{{ url_for('survey') }}" target="">survey link</a></b>
         </h2>
     </p>
 </body>
