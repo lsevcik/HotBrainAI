@@ -5,6 +5,8 @@ from time import sleep
 import ctypes
 import sys
 import cv2
+import csv
+import os
 
 # Event handler for scan finding a headband, prints sensor info
 def sensor_found(scanner, sensors):
@@ -121,17 +123,59 @@ try:
         # if sensor.is_supported_feature(SensorFeature.FeatureResist):
         #     sensor.resistDataReceived = on_resist_data_received
 
-        # Take signal data output and store into a CSV file
-        with open('output.csv', 'w', newline='') as dataFile:
+        # Creates a temporary text file for parsing the data
+        with open('output.txt', 'w', newline='') as dataFile:
             if sensor.is_supported_command(SensorCommand.CommandStartSignal):
                 sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
 
                 displayMsg() # Get the user ready with a message
                 sys.stdout = dataFile  # Redirect stdout to the file
-                playVideo()
+                playVideo() # Play the customer's video
                 sys.stdout = sys.__stdout__ # Stop redirect
 
                 sensor.exec_command(SensorCommand.CommandStopSignal)
+
+        # Opens the text file to parse the data and creates a csv file with the parsed data
+        with open('output.txt') as fdin, open('output.csv', 'w', newline='') as fdout:
+            wr = csv.DictWriter(fdout, fieldnames=['PackNum_1', 'O1_1', 'O2_1', 'T3_1', 'T4_1', '', 'PackNum_2', 'O1_2', 'O2_2', 'T3_2', 'T4_2'],
+                                extrasaction='ignore')  # ignore unwanted fields
+            
+            row_1, row_2 = {}, {} # Initialize empty dictionaries
+            wr.writeheader()    # write the header line
+
+            # Read the data file line by line and parse data for csv file
+            while True:
+                data = fdin.readline() # Get the next line
+                
+                if not data: # End of file
+                    break
+
+                data = data.strip("[BrainBitSignalData(")
+                
+                count = 0 # Loop counter
+                while count < 2: # Loops twice because of bimodal readings, parses fields for PackNo, O1, O2, T3, and T4
+                    packNo, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1]
+                    data = data.strip(f"Marker={packNo}, ")
+                    o1, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1].strip()
+                    o2, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1].strip()  
+                    t3, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1].strip()
+                    
+                    if count == 0: # Checking for first set of data, allows proper parsing
+                        t4, data = data.split('=', 1)[1].split(',', 1)[0].strip(')'), data.split('=', 1)[1].split(',', 1)[1].strip()
+                        data = data.strip("), BrainBitSignalData(")
+                        row_1 = {wr.fieldnames[0]: packNo, wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4} # First set of data for the row
+                    else: # End of the second set of data
+                        t4 = data.split('=', 1)[1].strip(')]')
+                        row_2 = {wr.fieldnames[6]: packNo, wr.fieldnames[7]: o1, wr.fieldnames[8]: o2, wr.fieldnames[9]: t3, wr.fieldnames[10]: t4} # Second set of data for the row
+                    
+                    count += 1 # Update loop counter
+
+                row_1.update(row_2) # Merge the dictionaries for the two sets of data
+
+                if len(row_1) != 0: # Check if a row has been parsed then add to the csv file
+                    wr.writerow(row_1)
+
+        os.remove("output.txt") # Delete temporary text file
 
         # if sensor.is_supported_command(SensorCommand.CommandStartResist):
         #     sensor.exec_command(SensorCommand.CommandStartResist)
