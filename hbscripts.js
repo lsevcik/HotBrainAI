@@ -1,6 +1,6 @@
 const btn = document.querySelector('.btn');
 const output = document.querySelector('.output');
-const url = 'json6.json';
+const url = 'https://github.com/lsevcik/HotBrainAI/blob/FrontEnd/userdata.json';
 
 btn.onclick = ()=>{
     output.innerHTML = 'Connecting......';
