@@ -12,13 +12,11 @@ import logging
 from tools.db_con import get_db
 
 from tools.token_required import token_required
-from tools.get_aws_secrets import get_secrets
 from tools.session import start_session
 
 app = Flask(__name__)
 
 app.config.from_file("config.yml", load=yaml.safe_load)
-app.config["secrets"] = get_secrets()
 
 app.logger.setLevel(logging.DEBUG)
 
@@ -29,7 +27,22 @@ FlaskJSON(app)
 
 @app.route("/")
 def index():
-    return redirect("/static/index.html")
+    return render_template("index.html")
+
+
+@app.route("/login")
+def index():
+    return render_template("login.html")
+
+
+@app.route("/survey")
+def index():
+    return render_template("survey.html")
+
+
+@app.route("/matches")
+def index():
+    return render_template("matches.html")
 
 
 @app.route("/user_api/<proc_name>", methods=["GET", "POST"])
@@ -61,9 +74,10 @@ def exec_open_proc(proc_name):
 
 
 @app.route("/scanner_api/<proc_name>", methods=["GET", "POST"])
+@token_required
 def exec_scanner_proc(proc_name):
     try:
-        fn = getattr(__import__("open_calls." + proc_name), proc_name)
+        fn = getattr(__import__("scanner_calls." + proc_name), proc_name)
         return fn.handle_request()
     except Exception as err:
         ex_data = str(Exception) + "\n"

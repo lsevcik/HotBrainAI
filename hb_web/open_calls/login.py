@@ -19,8 +19,11 @@ def handle_request():
 
     # TODO: Password Authentication
 
+    # TODO: Get user's role (user or admin)
+    role = "admin"
+
     # Create JWT
-    jwt = {"sub": username}
+    jwt = {"sub": username, "role": role}
 
     # Return JWT to authenticated user
     return json_response(token=create_token(jwt), authenticated=True)
