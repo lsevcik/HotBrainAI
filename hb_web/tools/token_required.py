@@ -3,13 +3,11 @@ from functools import wraps
 from flask import request, redirect, g, current_app
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 
-from tools.get_aws_secrets import get_secrets
-
 
 def token_required(f):
     @wraps(f)
     def _verify(*args, **kwargs):
-        secrets = get_secrets()
+        secrets = current_app.config["secrets"]
         auth_headers = request.headers.get("Authorization", "").split(":")
 
         invalid_msg = {

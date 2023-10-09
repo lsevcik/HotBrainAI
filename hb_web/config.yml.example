@@ -1,6 +1,7 @@
 secrets:
         secret_name : "dev_cis_444_secrets"
         region_name : "us-west-2"
+        jwt_backup : "KxQ(S#@>\"5=m$#58SgzD,+H+a73*pzKH,g5_"
 
 database:
         host : "localhost"
