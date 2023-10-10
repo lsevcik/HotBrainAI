@@ -1,49 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hot Brain</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+{% extends "base.html" %}
+{% block body %}
+<h1>
+    Welcome to Hot Brain
+</h1>
 
-    <style>
-        body {
-            background-color: rgb(185, 178, 185);
-        }
-
-        h1 {
-            font-size: 40px;
-            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-            text-align: center;
-        }
-
-        h2 {
-            font-size: 28px;
-            text-align: center;
-        }
-    </style>
-
-</head>
-<body>
-    <div id="main">
-        <ul>
-            <li><a class="active" href="index.html">Home</a></li>
-            <li><a href="{{ url_for('matches') }}">Matches</a></li>
-            <li><a href="{{ url_for('survey') }}">Survey</a></li>
-        </ul>
-    </div>
-
-    <h1>
-        Welcome to Hot Brain
-    </h1>
-
-    <p>
-        <h2>
-            Calm your mind.<br/>
-            Relax your thoughts.<br/>
-            React naturally.<br/>
-            <b><a href="{{ url_for('survey') }}" target="">survey link</a></b>
-        </h2>
-    </p>
-</body>
-</html>
+<p>
+    <h2>
+        Calm your mind.<br />
+        Relax your thoughts.<br />
+        React naturally.<br />
+        <b><a href="{{ url_for('survey') }}" target="">survey link</a></b>
+    </h2>
+</p>
+{% endblock %}
