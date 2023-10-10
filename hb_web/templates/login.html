@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ super() }}- Login{% endblock %}
+{% block head %}
+{{ super() }}
+<style type="text/css">
+    div.survey {
+        text-align: center;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<h1>Login</h1>
+<form method="post" action="/open_api/login">
+    <label for="username">Username: </label>
+    <input type="text" name="username" /> <br />
+    <label for="password">Password: </label>
+    <input type="password" name="password" /><br />
+    <input type="submit" />
+</form>
+<hr />
+<h1>Register</h1>
+<form method="post" action="/open_api/register">
+    <label for="username">Username: </label>
+    <input type="text" name="username" /><br />
+    <label for="password">Password: </label>
+    <input type="password" name="password" /><br />
+    <input type="submit" />
+</form>
+{% endblock %}
