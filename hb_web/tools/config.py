@@ -1,9 +1,10 @@
-import yaml
-import os
+from flask.config import Config
+from os import path
 
 def get_config():
-    with open(os.path.join(os.path.dirname(__file__), '..', 'config.yml')) as yml_file:
-        return yaml.safe_load(yml_file)
+    config = Config(path.join(path.dirname(__file__), ".."))
+    config.from_pyfile(filename="config.cfg")
+    return config
 
 if __name__ == "__main__":
     print(get_config())
