@@ -7,7 +7,6 @@ from flask_json import FlaskJSON, JsonError, json_response, as_json
 def token_required(f):
     @wraps(f)
     def _verify(*args, **kwargs):
-        secrets = current_app.config["secrets"]
         auth_headers = request.headers.get("Authorization", "").split(":")
 
         invalid_msg = {
@@ -24,7 +23,7 @@ def token_required(f):
 
         try:
             token = auth_headers[1]
-            data = jwt.decode(token, secrets["JWT"], algorithms=["HS256"])
+            data = jwt.decode(token, current_app.config["JWT_SECRET"], algorithms=["HS256"])
             g.jwt_data = data
         except jwt.ExpiredSignatureError:
             return json_response(status_=401, message=expired_msg)

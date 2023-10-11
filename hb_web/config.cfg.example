@@ -1,0 +1,6 @@
+JWT_SECRET = 'KxQ(S#@>\"5=m$#58SgzD,+H+a73*pzKH,g5_'
+POSTGRES_HOST = 'localhost'
+POSTGRES_DB = 'hotbrain'
+POSTGRES_USERNAME = 'hotbrain'
+POSTGRES_PASSWORD = 'hotbrain'
+SECRET_KEY = '123abc'
