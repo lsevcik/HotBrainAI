@@ -1,4 +1,4 @@
-from flask import request, abort, current_app
+from flask import request, abort, current_app, redirect, url_for, session
 from flask_json import json_response
 from tools.token_tools import create_token
 from models.user import User
@@ -13,8 +13,9 @@ def handle_request():
     # Log the user in
     loginUser = User.login(username=request.form["username"])
 
-    # Create JWT
-    jwt = {"sub": loginUser.username, "role": loginUser.role}
+    session["logged_in"] = True
+    session["user_userid"] = loginUser.id
+    session["user_username"] = loginUser.username
 
-    # Return JWT to authenticated user
-    return json_response(token=create_token(jwt), authenticated=True)
+    # Return to user
+    return redirect(location=url_for("index"))

@@ -11,7 +11,7 @@ class User:
         db, cur = get_db()
         cur.execute("SELECT Username FROM Users WHERE UserID = %s", (self.id,))
 
-        self.username = cur.fetchone()
+        self.username, = cur.fetchone()
         self.role = "admin" # TODO: User roles
 
     @staticmethod
@@ -29,4 +29,15 @@ class User:
 
     @staticmethod
     def register(*args, **kwargs):
-        pass
+        db, cur = get_db()
+        cur.execute("INSERT INTO Users (Username) VALUES (%s) RETURNING UserID", (kwargs["username"],))
+
+        if cur.rowcount != 1:  # Operation failed for some reason
+            raise Unauthorized("Account matching our records not found.")
+
+        # TODO: Password Authentication
+
+        db.commit()
+
+        user_id = cur.fetchone()[0]
+        return User(id=user_id)
