@@ -2,5 +2,5 @@
     <li><a {% if request.endpoint=="index" %} class="active" {% endif %} href="{{ url_for('index') }}">Home</a></li>
     <li><a {% if request.endpoint=="matches" %} class="active" {% endif %} href="{{ url_for('matches') }}">Matches</a></li>
     <li><a {% if request.endpoint=="survey" %} class="active" {% endif %} href="{{ url_for('survey') }}">Survey</a></li>
-    <li style="float:right"><a {% if request.endpoint=="Login" %} class="active" {% endif %} href="{{ url_for('login') }}">Login</a></li>
+    <li style="float:right"><a {% if request.endpoint=="login" %} class="active" {% endif %} href="{{ url_for('login') }}">Login</a></li>
 </ul>

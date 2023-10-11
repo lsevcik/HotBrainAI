@@ -1,6 +1,6 @@
 import psycopg2
 
-from .config import get_config
+from config import get_config
 
 def connect_to_database():
     config = get_config()
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     con, cur = connect_to_database()
 
     cur.execute("DROP TABLE IF EXISTS Users;")
-    cur.execute("CREATE TABLE Users (UserID SERIAL PRIMARY KEY, Username VARCHAR(32));")
+    cur.execute("CREATE TABLE Users (UserID SERIAL PRIMARY KEY, Username VARCHAR(32) UNIQUE);")
     cur.execute("INSERT INTO Users (Username) VALUES ('admin');")
 
     con.commit()
