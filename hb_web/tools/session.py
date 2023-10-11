@@ -13,4 +13,3 @@ def start_session(f):
         return f(*args, **kwargs)
 
     return _start
-
