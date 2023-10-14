@@ -1,17 +1,18 @@
 from flask import Flask, render_template
-from flask_json import FlaskJSON
 
-import routes.api
+from routes.api import api
 
 
 app = Flask(__name__)
 
+# Make the WSGI interface available at the top level so wfastcgi can get it.
+wsgi_app = app.wsgi_app
+
+# Import contents of config.cfg to app.config
 app.config.from_pyfile("config.cfg")
 
+# Set loglevel to debug
 app.logger.setLevel(10) # DEBUG
-
-FlaskJSON(app)
-
 
 @app.route("/")
 def index():
@@ -29,7 +30,13 @@ def survey():
 def matches():
     return render_template("matches.html")
 
-app.register_blueprint(routes.api.api, url_prefix="/api")
+app.register_blueprint(api, url_prefix="/api")
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+if __name__ == '__main__':
+    import os
+    HOST = os.environ.get('SERVER_HOST', 'localhost')
+    try:
+        PORT = int(os.environ.get('SERVER_PORT', '8080'))
+    except ValueError:
+        PORT = 8080
+    app.run(HOST, PORT)

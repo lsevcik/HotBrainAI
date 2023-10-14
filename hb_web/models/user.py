@@ -1,23 +1,26 @@
 from werkzeug.exceptions import Unauthorized
-from .db import get_db
+from models.db import get_db
+
 
 class User:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         if "id" not in kwargs:
-            raise Exception()
+            raise ValueError()
 
-        self.id = kwargs['id']
-        
-        db, cur = get_db()
+        self.id = kwargs["id"]
+
+        _, cur = get_db()
         cur.execute("SELECT Username FROM Users WHERE UserID = %s", (self.id,))
 
-        self.username, = cur.fetchone()
-        self.role = "admin" # TODO: User roles
+        (self.username,) = cur.fetchone()
+        self.role = "admin"  # TODO: User roles
 
     @staticmethod
-    def login(*args, **kwargs):
-        db, cur = get_db()
-        cur.execute("SELECT UserID FROM Users WHERE Username = %s", (kwargs["username"],))
+    def login(**kwargs):
+        _, cur = get_db()
+        cur.execute(
+            "SELECT UserID FROM Users WHERE Username = %s", (kwargs["username"],)
+        )
 
         if cur.rowcount != 1:  # User enters a username that doesn't exist
             raise Unauthorized("Account matching our records not found.")
@@ -28,9 +31,12 @@ class User:
         return User(id=user_id)
 
     @staticmethod
-    def register(*args, **kwargs):
+    def register(**kwargs):
         db, cur = get_db()
-        cur.execute("INSERT INTO Users (Username) VALUES (%s) RETURNING UserID", (kwargs["username"],))
+        cur.execute(
+            "INSERT INTO Users (Username) VALUES (%s) RETURNING UserID",
+            (kwargs["username"],),
+        )
 
         if cur.rowcount != 1:  # Operation failed for some reason
             raise Unauthorized("Account matching our records not found.")

@@ -1,6 +1,4 @@
 from flask import request, abort, current_app, redirect, url_for, session
-from flask_json import json_response
-from tools.token_tools import create_token
 from models.user import User
 
 
