@@ -1,6 +1,7 @@
 import psycopg2
 from flask import current_app, g
 
+
 def connect_to_database():
     connection = psycopg2.connect(
         host=current_app.config["POSTGRES_HOST"],
@@ -15,6 +16,6 @@ def connect_to_database():
 def get_db():
     if "db" not in g:
         g.db = {}
-        g.db['connection'], g.db['cursor'] = connect_to_database()
+        g.db["connection"], g.db["cursor"] = connect_to_database()
 
-    return (g.db['connection'], g.db['cursor'])
+    return (g.db["connection"], g.db["cursor"])

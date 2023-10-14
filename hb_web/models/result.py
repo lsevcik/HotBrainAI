@@ -1,14 +1,14 @@
-from werkzeug.exceptions import Unauthorized
-from .db import get_db
+from models.db import get_db
+
 
 class Result:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         if "id" not in kwargs:
-            raise Exception()
+            raise ValueError()
 
-        self.id = kwargs['id']
-        
-        db, cur = get_db()
+        self.id = kwargs["id"]
+
+        _, cur = get_db()
         cur.execute("SELECT user_id, url FROM results WHERE id = %s", (self.id,))
 
         self.user_id, self.url = cur.fetchone()
