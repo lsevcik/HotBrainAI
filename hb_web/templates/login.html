@@ -10,7 +10,7 @@
 {% endblock %}
 {% block body %}
 <h1>Login</h1>
-<form method="post" action="/api/open/login">
+<form method="post" action="{{ url_for('api.api_open.handle_login') }}">
     <label for="username">Username: </label>
     <input type="text" name="username" /> <br />
     <label for="password">Password: </label>
@@ -19,7 +19,7 @@
 </form>
 <hr />
 <h1>Register</h1>
-<form method="post" action="/api/open/register">
+<form method="post" action="{{ url_for('api.api_open.handle_register') }}">
     <label for="username">Username: </label>
     <input type="text" name="username" /><br />
     <label for="password">Password: </label>

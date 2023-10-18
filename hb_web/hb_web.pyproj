@@ -28,9 +28,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.py" />
-    <Compile Include="models\db.py" />
+    <Compile Include="database.py" />
     <Compile Include="models\result.py" />
     <Compile Include="models\user.py" />
+    <Compile Include="models\__init__.py" />
     <Compile Include="routes\api\open\login.py" />
     <Compile Include="routes\api\open\register.py" />
     <Compile Include="routes\api\open\__init__.py" />
@@ -42,7 +43,6 @@
     <Compile Include="routes\api\user\__init__.py" />
     <Compile Include="routes\api\__init__.py" />
     <Compile Include="tools\config.py" />
-    <Compile Include="tools\db_con.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
