@@ -1,49 +1,64 @@
-from werkzeug.exceptions import Unauthorized
-from models.db import get_db
+import enum
+import bcrypt
+from sqlalchemy import Column, Identity, Integer, String, Enum, select
+from sqlalchemy.orm import Session
+from database import Base, engine
 
 
-class User:
-    def __init__(self, **kwargs):
-        if "id" not in kwargs:
-            raise ValueError()
+class Role(enum.Enum):
+    USER = 1
+    ADMIN = 2
 
-        self.id = kwargs["id"]
 
-        _, cur = get_db()
-        cur.execute("SELECT Username FROM Users WHERE UserID = %s", (self.id,))
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, Identity(), primary_key=True)
+    username = Column(String(120), unique=True)
+    password = Column(String(60))
+    role = Column(Enum(Role))
+    first_name = Column(String(50))
+    last_name = Column(String(50))
 
-        (self.username,) = cur.fetchone()
-        self.role = "admin"  # TODO: User roles
+    def __init__(
+        self,
+        username=None,
+        password=None,
+        role=Role.USER,
+        first_name=None,
+        last_name=None,
+    ):
+        self.username = username
+        self.password = password.decode("UTF-8")
+        self.role = role
+        self.first_name = first_name
+        self.last_name = last_name
 
-    @staticmethod
-    def login(**kwargs):
-        _, cur = get_db()
-        cur.execute(
-            "SELECT UserID FROM Users WHERE Username = %s", (kwargs["username"],)
-        )
+    def __repr__(self):
+        return f"<User {self.username!r}>"
 
-        if cur.rowcount != 1:  # User enters a username that doesn't exist
-            raise Unauthorized("Account matching our records not found.")
 
-        # TODO: Password Authentication
+def login(username, **kwargs):
+    session = Session(engine)
+    stmt = select(User).where(User.username == username)
+    result = session.execute(stmt)
+    user = result.scalar_one()
 
-        user_id = cur.fetchone()
-        return User(id=user_id)
+    if bcrypt.checkpw(
+        kwargs["password"].encode("UTF-8"), user.password.encode("UTF-8")
+    ):
+        return user
+    else:
+        return False
 
-    @staticmethod
-    def register(**kwargs):
-        db, cur = get_db()
-        cur.execute(
-            "INSERT INTO Users (Username) VALUES (%s) RETURNING UserID",
-            (kwargs["username"],),
-        )
 
-        if cur.rowcount != 1:  # Operation failed for some reason
-            raise Unauthorized("Account matching our records not found.")
-
-        # TODO: Password Authentication
-
-        db.commit()
-
-        user_id = cur.fetchone()[0]
-        return User(id=user_id)
+def create_default_admin():
+    session = Session(engine)
+    default_admin = User(
+        username="admin",
+        password=bcrypt.hashpw(b"admin", bcrypt.gensalt()),
+        role=Role.ADMIN,
+        first_name="Admin",
+        last_name="User",
+    )
+    session.add(default_admin)
+    session.commit()

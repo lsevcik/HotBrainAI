@@ -1,19 +1,26 @@
 from flask import request, abort, current_app, redirect, url_for, session
-from models.user import User
+
+from models.user import login
 
 
 def handle_request():
+    # User is logged in
+    if session.get("logged_in", False):
+        return redirect("index")
+
     # User submits form without username or password
     if list(request.form.keys()) != ["username", "password"]:
         current_app.logger.debug(request.form.keys())
-        abort(401)
+        abort(400)
 
     # Log the user in
-    loginUser = User.login(username=request.form["username"])
+    user = login(request.form["username"], password=request.form["password"])
+    if not user:
+        abort(401)
 
     session["logged_in"] = True
-    session["user_userid"] = loginUser.id
-    session["user_username"] = loginUser.username
+    session["user_userid"] = user.id
+    session["user_username"] = user.username
 
     # Return to user
-    return redirect(location=url_for("index"))
+    return redirect(url_for("index"))

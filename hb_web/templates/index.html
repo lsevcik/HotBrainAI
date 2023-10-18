@@ -5,14 +5,13 @@
 </h1>
 
 <p>
-    {% if "logged_in" in session %}
-    LOGGED IN
-    {% endif %}
     <h2>
+        {% if session.get("logged_in", False) %}
+        Welcome {{ session.get("user_username") }} <br />
+        {% endif %}
         Calm your mind.<br />
         Relax your thoughts.<br />
         React naturally.<br />
-        <b><a href="{{ url_for('survey') }}" target="">survey link</a></b>
     </h2>
 </p>
 {% endblock %}
