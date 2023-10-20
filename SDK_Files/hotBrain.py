@@ -74,6 +74,45 @@ def playVideo():
     cap.release() # Release the capture
     cv2.destroyAllWindows() # Remove the window
 
+# Opens the text file to parse the data and creates a csv file with the parsed data
+def createOutputCSV():
+    with open('output.txt') as fdin, open('output.csv', 'w', newline='') as fdout:
+        wr = csv.DictWriter(fdout, fieldnames=['Sample', 'O1', 'O2', 'T3', 'T4'],
+                            extrasaction='ignore')  # Create header and ignore unwanted fields
+        wr.writeheader() # write the header line
+
+        row = {} # Initialize empty dictionary for the row
+        count = 1 # Loop counter
+
+        # Read the data file line by line and parse data for csv file
+        while True:
+            data = fdin.readline() # Get the next line
+            
+            if not data: # End of file
+                break
+            
+            data = data.split(' ') # Split up 01, 02, T3, T4
+
+            print("PackNum: ", data[0]) # For testing purposes
+
+            # Add sample # and electrode data to row values
+            Sample = count
+            o1 = data[1]
+            o2 = data[2]
+            t3 = data[3]
+            t4 = data[4].strip('\n') # Strip very last data point's new line character
+
+            # Create a row
+            row = {wr.fieldnames[0]: Sample, wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4}
+
+            count += 1 # Update loop counter
+
+            if len(row) != 0: # Check if a row has been parsed then add to the csv file
+                wr.writerow(row)
+
+    os.remove("output.txt") # Delete temporary text file
+
+
 try:
     scanner = Scanner([SensorFamily.SensorLEBrainBitBlack, SensorFamily.SensorLEBrainBit,
                     SensorFamily.SensorLECallibri]) # Check for headband sensors
@@ -136,42 +175,7 @@ try:
 
                 sensor.exec_command(SensorCommand.CommandStopSignal)
 
-        # Opens the text file to parse the data and creates a csv file with the parsed data
-        with open('output.txt') as fdin, open('output.csv', 'w', newline='') as fdout:
-            wr = csv.DictWriter(fdout, fieldnames=['Sample', 'O1', 'O2', 'T3', 'T4'],
-                            extrasaction='ignore')  # ignore unwanted fields
-        
-            row = {} # Initialize empty dictionaries
-            wr.writeheader()    # write the header line
-            count = 1 # Loop counter
-
-            # Read the data file line by line and parse data for csv file
-            while True:
-                data = fdin.readline() # Get the next line
-                
-                if not data: # End of file
-                    break
-                
-                data = data.split(' ') # Split up 01, 02, T3, T4
-
-                print("PackNum: ", data[0]) # For testing purposes
-
-                # Add sample # and electrode data to row values
-                Sample = count
-                o1 = data[1]
-                o2 = data[2]
-                t3 = data[3]
-                t4 = data[4].strip('\n') # Strip very last data point's new line character
-
-                # Create a row
-                row = {wr.fieldnames[0]: Sample, wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4}
-                
-                count += 1 # Update loop counter
-
-                if len(row) != 0: # Check if a row has been parsed then add to the csv file
-                    wr.writerow(row)
-
-        os.remove("output.txt") # Delete temporary text file
+        createOutputCSV() # Create the CSV file from output text
 
         # if sensor.is_supported_command(SensorCommand.CommandStartResist):
         #     sensor.exec_command(SensorCommand.CommandStartResist)
