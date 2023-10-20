@@ -19,7 +19,8 @@ def on_sensor_state_changed(sensor, state):
 
 # Event handler for signal data being recieved
 def on_signal_data_received(sensor, data):
-    print(data)
+    for i in range(len(data)):
+        print(data[i].PackNum, data[i].O1, data[i].O2, data[i].T3, data[i].T4)
 
 # Event handler for resist data being recieved
 # def on_resist_data_received(sensor, data):
@@ -127,7 +128,7 @@ try:
         with open('output.txt', 'w', newline='') as dataFile:
             if sensor.is_supported_command(SensorCommand.CommandStartSignal):
                 sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
-
+                
                 displayMsg() # Get the user ready with a message
                 sys.stdout = dataFile  # Redirect stdout to the file
                 playVideo() # Play the customer's video
@@ -137,11 +138,12 @@ try:
 
         # Opens the text file to parse the data and creates a csv file with the parsed data
         with open('output.txt') as fdin, open('output.csv', 'w', newline='') as fdout:
-            wr = csv.DictWriter(fdout, fieldnames=['PackNum_1', 'O1_1', 'O2_1', 'T3_1', 'T4_1', '', 'PackNum_2', 'O1_2', 'O2_2', 'T3_2', 'T4_2'],
-                                extrasaction='ignore')  # ignore unwanted fields
-            
-            row_1, row_2 = {}, {} # Initialize empty dictionaries
+            wr = csv.DictWriter(fdout, fieldnames=['Sample', 'O1', 'O2', 'T3', 'T4'],
+                            extrasaction='ignore')  # ignore unwanted fields
+        
+            row = {} # Initialize empty dictionaries
             wr.writeheader()    # write the header line
+            count = 1 # Loop counter
 
             # Read the data file line by line and parse data for csv file
             while True:
@@ -149,31 +151,25 @@ try:
                 
                 if not data: # End of file
                     break
-
-                data = data.strip("[BrainBitSignalData(")
                 
-                count = 0 # Loop counter
-                while count < 2: # Loops twice because of bimodal readings, parses fields for PackNo, O1, O2, T3, and T4
-                    packNo, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1]
-                    data = data.strip(f"Marker={packNo}, ")
-                    o1, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1].strip()
-                    o2, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1].strip()  
-                    t3, data = data.split('=', 1)[1].split(',', 1)[0], data.split('=', 1)[1].split(',', 1)[1].strip()
-                    
-                    if count == 0: # Checking for first set of data, allows proper parsing
-                        t4, data = data.split('=', 1)[1].split(',', 1)[0].strip(')'), data.split('=', 1)[1].split(',', 1)[1].strip()
-                        data = data.strip("), BrainBitSignalData(")
-                        row_1 = {wr.fieldnames[0]: packNo, wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4} # First set of data for the row
-                    else: # End of the second set of data
-                        t4 = data.split('=', 1)[1].strip(')]')
-                        row_2 = {wr.fieldnames[6]: packNo, wr.fieldnames[7]: o1, wr.fieldnames[8]: o2, wr.fieldnames[9]: t3, wr.fieldnames[10]: t4} # Second set of data for the row
-                    
-                    count += 1 # Update loop counter
+                data = data.split(' ') # Split up 01, 02, T3, T4
 
-                row_1.update(row_2) # Merge the dictionaries for the two sets of data
+                print("PackNum: ", data[0]) # For testing purposes
 
-                if len(row_1) != 0: # Check if a row has been parsed then add to the csv file
-                    wr.writerow(row_1)
+                # Add sample # and electrode data to row values
+                Sample = count
+                o1 = data[1]
+                o2 = data[2]
+                t3 = data[3]
+                t4 = data[4].strip('\n') # Strip very last data point's new line character
+
+                # Create a row
+                row = {wr.fieldnames[0]: Sample, wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4}
+                
+                count += 1 # Update loop counter
+
+                if len(row) != 0: # Check if a row has been parsed then add to the csv file
+                    wr.writerow(row)
 
         os.remove("output.txt") # Delete temporary text file
 

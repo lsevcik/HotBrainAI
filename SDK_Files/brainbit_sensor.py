@@ -38,12 +38,14 @@ class BrainBitSensor(ResistSensor, SignalSensor):
 
     def __add_signal_data_callback_brain_bit(self):
         def __py_signal_data_callback_brain_bit(ptr, data, sz_data, user_data):
-            signal_data = [BrainBitSignalData(PackNum=int(data[i].PackNum),
+            signal_data = []
+            for i in range(sz_data):
+                signal_data.append(BrainBitSignalData(PackNum=int(data[i].PackNum),
                                               Marker=int(data[i].Marker),
                                               O1=float(data[i].O1),
                                               O2=float(data[i].O2),
                                               T3=float(data[i].T3),
-                                              T4=float(data[i].T4)) for i in range(sz_data)]
+                                              T4=float(data[i].T4)))
             if user_data.signalDataReceived is not None:
                 user_data.signalDataReceived(user_data, signal_data)
 

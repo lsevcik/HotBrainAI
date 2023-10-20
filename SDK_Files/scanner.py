@@ -175,7 +175,7 @@ class Scanner:
         si.SerialNumber = sensor_info.SerialNumber.encode('utf-8')
         si.PairingRequired = int(sensor_info.PairingRequired)
 
-        sensor_ptr = _neuro_lib.createSensor(self.__ptr, si, byref(status))
+        sensor_ptr = _neuro_lib.createSensor(self.__ptr, si, byref(status)) # Causes error when trying to spoof
         raise_exception_if(status)
         family = sensor_info.SensFamily
         if family in (SensorFamily.SensorLECallibri, SensorFamily.SensorLEKolibri):
