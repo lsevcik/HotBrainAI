@@ -29,6 +29,9 @@
   <ItemGroup>
     <Compile Include="app.py" />
     <Compile Include="database.py" />
+    <Compile Include="models\match.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="models\result.py" />
     <Compile Include="models\user.py" />
     <Compile Include="models\__init__.py" />
