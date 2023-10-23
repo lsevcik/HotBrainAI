@@ -1,6 +1,10 @@
 <ul>
     <li><a {% if request.endpoint=="index" %} class="active" {% endif %} href="{{ url_for('index') }}">Home</a></li>
+    {% if session.get("logged_in") %}
     <li><a {% if request.endpoint=="matches" %} class="active" {% endif %} href="{{ url_for('matches') }}">Matches</a></li>
-    <li><a {% if request.endpoint=="survey" %} class="active" {% endif %} href="{{ url_for('survey') }}">Survey</a></li>
+    <li style="float:right"><a href="/api/user/logout">Logout</a></li>
+    <li style="float:right"><a {% if request.endpoint=="survey" %} class="active" {% endif %} href="{{ url_for('survey') }}">{{ session.get("user_username") }}</a></li>
+    {% else %}
     <li style="float:right"><a {% if request.endpoint=="login" %} class="active" {% endif %} href="{{ url_for('login') }}">Login</a></li>
+    {% endif %}
 </ul>
