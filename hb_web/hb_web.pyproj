@@ -49,10 +49,6 @@
     <Content Include="config.cfg" />
     <Content Include="config.cfg.example" />
     <Content Include="requirements.txt" />
-    <Content Include="static\cis444.js" />
-    <Content Include="static\hbscripts.js" />
-    <Content Include="static\index.html" />
-    <Content Include="static\scripts.js" />
     <Content Include="static\style.css" />
     <Content Include="templates\bar.html" />
     <Content Include="templates\base.html" />
