@@ -1,0 +1,3 @@
+K:/HotBrainAI/Content/Code/GenerateScans/Debug/CMakeFiles/GenerateScans.dir
+K:/HotBrainAI/Content/Code/GenerateScans/Debug/CMakeFiles/edit_cache.dir
+K:/HotBrainAI/Content/Code/GenerateScans/Debug/CMakeFiles/rebuild_cache.dir
