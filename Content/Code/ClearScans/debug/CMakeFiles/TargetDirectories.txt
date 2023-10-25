@@ -1,0 +1,3 @@
+K:/HotBrainAI/Content/Code/ClearScans/debug/CMakeFiles/ClearScans.dir
+K:/HotBrainAI/Content/Code/ClearScans/debug/CMakeFiles/edit_cache.dir
+K:/HotBrainAI/Content/Code/ClearScans/debug/CMakeFiles/rebuild_cache.dir
