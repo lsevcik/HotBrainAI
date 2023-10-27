@@ -15,24 +15,24 @@ app.config.from_pyfile("config.cfg")
 app.logger.setLevel(10)  # DEBUG
 
 
-@app.route("/")
+@app.route("/index.html")
 def index():
     return render_template("index.html")
 
 
-@app.route("/login")
+@app.route("/login.html")
 def login():
     if session.get("logged_in", False):
         return redirect(url_for("index"))
     return render_template("login.html")
 
 
-@app.route("/survey")
+@app.route("/survey.html")
 def survey():
     return render_template("survey.html")
 
 
-@app.route("/matches")
+@app.route("/matches.html")
 def matches():
     return render_template("matches.html")
 
