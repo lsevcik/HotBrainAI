@@ -11,8 +11,18 @@
 </style>
 {% endblock %}
 {% block body %}
-<table>
-<thead><tr><td>Name</td><td>Compatibility</td></tr></thead>
-    <tr><td>Person McPersonface</td><td>100%</td></tr>
-</table>
+
+<h2> Temp holding until I can figure out getting data from PostgreSQL</h2>
+<script>
+document.write("<table border='1'> <caption>Matches</caption> <tr><th>User</th><th>Match Rating</th></tr>");
+
+for(var i = 0; i<=5; i++){
+    {
+        document.write("<tr><td> Match "+i+"</td><td>"+Math.floor(Math.random() * 100)+"</td></tr>");
+    }
+}
+</script>
+
+
+
 {% endblock %}
