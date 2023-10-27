@@ -1,13 +1,37 @@
 import enum
 import bcrypt
-from sqlalchemy import Column, Identity, Integer, String, Enum, select
-from sqlalchemy.orm import Session
+from sqlalchemy import Column, ForeignKey, Identity, Integer, String, Enum, select
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from database import Base, engine
 
 
 class Role(enum.Enum):
     USER = 1
     ADMIN = 2
+
+
+class GenderClass(enum.Enum):
+    CISGENDER = 1
+    TRANSGENDER = 2
+    OTHER = 3
+
+
+class Gender(enum.Enum):
+    MALE = 1
+    FEMALE = 2
+
+
+class Seeking(enum.Enum):
+    MALE = 1
+    FEMALE = 2
+    OTHER = 3
+
+
+class UserSeeking(Base):
+    __tablename__ = "users_seeking"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id = mapped_column(ForeignKey("users.id"), primary_key=True)
+    seeking = Column(Enum(Seeking), primary_key=True)
 
 
 class User(Base):
@@ -18,6 +42,9 @@ class User(Base):
     role = Column(Enum(Role))
     first_name = Column(String(50))
     last_name = Column(String(50))
+    gender_class = Column(Enum(GenderClass))
+    gender = Column(Enum(Gender))
+    seeking: Mapped[list["UserSeeking"]] = relationship()
 
     def __init__(
         self,
@@ -48,7 +75,7 @@ def login(username, **kwargs):
     ):
         return user
     else:
-        return False
+        return None
 
 
 def create_default_admin():
