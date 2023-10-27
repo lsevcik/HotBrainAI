@@ -10,6 +10,42 @@
 {% endblock %}
 {% block body %}
 <div class="survey">
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdfk2gKgDZG7hSDVph8pX_c89HgFqAiWNTK_hfnvx9U0kFJXw/viewform?embedded=true" width="640" height="800"></iframe>
+    <form action="post">
+
+        <label for="fname">Phone Number (will be your user ID):</label><br>
+        <input type="number" id="pnum" name="pnum" value="" minlength="7"><br>
+
+        <p>Gender Identity:</p>
+        <input type="radio" id="trans" name="gi" value="TRANS">
+        <label for="trans">Trans</label><br>
+        <input type="radio" id="cis" name="gi" value="CIS">
+        <label for="cis">Cis</label><br>
+        <input type="radio" id="nonbinary" name="gi" value="NONBINARY">
+        <label for="nonbinary">Nonbinary</label><br>
+
+        <p>Gender Role:</p>
+        <input type="radio" id="male" name="gr" value="MALE">
+        <label for="male">Male</label><br>
+        <input type="radio" id="female" name="gr" value="FEMALE">
+        <label for="female">Female</label><br>
+
+        <p>Are You Only Interested In Cisgender?</p>
+        <input type="radio" id="yes" name="interest" value="YES">
+        <label for="yes">Yes</label><br>
+        <input type="radio" id="no" name="interest" value="NO">
+        <label for="no">No</label><br>
+
+        <p>Seeking: </p>
+        <input type="checkbox" id="male" name="sex" value="<MALE">
+        <label for="male">Male</label><br>
+        <input type="checkbox" id="female" name="sex" value="FEMALE">
+        <label for="female">Female</label><br>
+        <input type="checkbox" id="nonbinary" name="sex" value="NONBINARY">
+        <label for="nonbinary">Nonbinary</label><br>
+        <input type="checkbox" id="open" name="sex" value="OPENTOALL">
+        <label for="open">Male</label><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
 </div>
 {% endblock %}
