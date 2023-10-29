@@ -7,6 +7,9 @@ import sys
 import cv2
 import csv
 import os
+import shutil
+import subprocess
+import requests
 
 # Event handler for scan finding a headband, prints sensor info
 def sensor_found(scanner, sensors):
@@ -41,6 +44,7 @@ def displayMsg():
 
 # Function to play a video for testing the headband
 def playVideo():
+# def playVideo(videoName):
     # Define variables
     videoName = "Videos\HotBrain_Test_Video.mp4" # Name of the video file
     windowName = "TEST VIDEO" # Name of the video window
@@ -76,6 +80,7 @@ def playVideo():
 
 # Opens the text file to parse the data and creates a csv file with the parsed data
 def createOutputCSV():
+# def createOutputCSV(dataFile):
     with open('output.txt') as fdin, open('output.csv', 'w', newline='') as fdout:
         wr = csv.DictWriter(fdout, fieldnames=['Sample', 'O1', 'O2', 'T3', 'T4'],
                             extrasaction='ignore')  # Create header and ignore unwanted fields
@@ -93,7 +98,7 @@ def createOutputCSV():
             
             data = data.split(' ') # Split up 01, 02, T3, T4
 
-            print("PackNum: ", data[0]) # For testing purposes
+            # print("PackNum: ", data[0]) # For testing purposes
 
             # Add sample # and electrode data to row values
             Sample = count
@@ -112,17 +117,44 @@ def createOutputCSV():
 
     os.remove("output.txt") # Delete temporary text file
 
+    shutil.move(f'{fdout.name}', f'Processing/{fdout.name}') # Moves the newly created CSV file to processing folder
+    
+
+# def getVideoUrl():
+#     url = "url_to_server" # ToDo: Get the url where we receive video data from server
+#     videoUrl = requests.get(url)
+
+#     if videoUrl:
+#         return videoUrl
+
+# # Attempts to send a datafile to the server
+# def sendFileToServer(fileName):
+#     dataFile = open(fileName, "rb") # Open the dataFile
+#     url = "url_to_server" # ToDo: Get the url where we want to post the csv files
+#     submission = requests.post(url, files = {"form_field_name": dataFile}) # ToDo: Get the form_field_name from server
+    
+#     if submission.ok: # Checks if the file was submitted 
+#         return True
+#     else:
+#         return False
 
 try:
-    scanner = Scanner([SensorFamily.SensorLEBrainBitBlack, SensorFamily.SensorLEBrainBit,
-                    SensorFamily.SensorLECallibri]) # Check for headband sensors
+    # Runs the generatescans and clearscans programs
+    os.chdir('Programs_From_Shane')
+    subprocess.call(args='start', executable='GenerateScans.exe')
+    os.chdir('user_scans')
+    # subprocess.call(args='start', executable='ClearScans.exe')
+    os.chdir('..\..')
+
+    scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
     scanner.sensorsChanged = sensor_found # Call event handler for sensor found
     
-    # Search for the headband (up to 5 seconds)
+    # Search for the headband
     scanner.start()
-    print("Starting search for 5 sec...")
-    sleep(5)
+    print("Starting search...")
+    while len(scanner.sensors()) == 0:
+        sleep(1)
     scanner.stop()
 
     # Loop while the device is connected and run all features
@@ -141,27 +173,14 @@ try:
 
         sensFamily = sensor.sens_family
 
-        # Print all sensor info
-        print(sensFamily)
-        print(sensor.features)
-        print(sensor.commands)
-        print(sensor.parameters)
-        print(sensor.name)
-        print(sensor.state)
-        print(sensor.address)
-        print(sensor.serial_number)
-        print(sensor.batt_power)
-        print(sensor.sampling_frequency)
-        print(sensor.gain)
-        print(sensor.data_offset)
-        print(sensor.version)
-
         # Start the signal data feature
         if sensor.is_supported_feature(SensorFeature.FeatureSignal):
             sensor.signalDataReceived = on_signal_data_received
 
         # if sensor.is_supported_feature(SensorFeature.FeatureResist):
         #     sensor.resistDataReceived = on_resist_data_received
+
+        # videoName = getVideoUrl()
 
         # Creates a temporary text file for parsing the data
         with open('output.txt', 'w', newline='') as dataFile:
@@ -176,6 +195,8 @@ try:
                 sensor.exec_command(SensorCommand.CommandStopSignal)
 
         createOutputCSV() # Create the CSV file from output text
+
+        # sendFileToServer(dataFile)
 
         # if sensor.is_supported_command(SensorCommand.CommandStartResist):
         #     sensor.exec_command(SensorCommand.CommandStartResist)
