@@ -1,11 +1,16 @@
 #include <string>
+#include <vector>
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <cmath>
+#include <cctype>
+#include <iomanip>
 
 using namespace std;
 namespace fs = filesystem;
+
+const int MAX_MATCHES = 10; // For checking if user has more than 10 matches already
 
 struct userMatch
 {
@@ -16,14 +21,17 @@ struct userMatch
 struct user
 {
     string userID;
-    userMatch allMatches;
+    vector<userMatch> allMatches;
+    int size; // Stores the # of matches user currently has
 };
 
+vector<user> allUserMatches; // Global vector for user matches
+
 string targetFolder(char vid) {
-    string path0 = "standard\\";
-    string path1 = "trad\\";
-    string path2 = "male\\";
-    string path3 = "female\\";
+    string path0 = "standard/";
+    string path1 = "trad/";
+    string path2 = "male/";
+    string path3 = "female/";
 
     switch (vid) {
         case 'S':
@@ -37,28 +45,56 @@ string targetFolder(char vid) {
     }
 }
 
+// Checks allUserMatches vector for the current processed user in case they already exist
+vector<user>::iterator find_user_ID(string procUser)
+{
+    vector<user>::iterator it;
+
+    for(it = allUserMatches.begin(); it != allUserMatches.end(); it++)
+        if(it->userID == procUser)
+            return it;
+    
+    return it;
+}
+
+// Displays all the matches that were processed
+void viewAllMatches()
+{
+    std::cout << "Processed User ID | Compared User ID | Average" << endl;
+
+    for(vector<user>::iterator it1 = allUserMatches.begin(); it1 != allUserMatches.end(); it1++)
+    {
+        for(vector<userMatch>::iterator it2 = it1->allMatches.begin(); it2 != it1->allMatches.end(); it2++)
+        {
+            std::cout << setw(14) << it1->userID << setw(18) << it2->userMatchID << setw(14) << it2->matchAvg << endl;
+        }
+    }
+}
+
+// Stores each match into the allUserMatches vector (Will eventually be the database)
 void storeMatches(string procUser, string compUser, float average){
-    vector<user> allUserMatches;
-    vector<userMatch> current;
-    current.push_back({compUser, average});
+    // Store the match if needed
+    vector<userMatch> currentMatch;
+    currentMatch.push_back({compUser, average});
 
-//    allUserMatches.front().userID = procUser;
-//    allUserMatches[0].allMatches = current.front();
+    vector<user>::iterator it = find_user_ID(procUser); // Check for user in set
 
-    cout << "MatchAvg:  " << current[0].matchAvg << endl;
+    if(it != allUserMatches.end()) // User already in set
+    {
+        it->allMatches.push_back({compUser, average}); // Add match to it's set
+        it->size++;
+    } 
+    else // User not in set
+        allUserMatches.push_back({procUser, currentMatch, 1}); // Add user and it's match to the set, also update the size
 
-
-    cout << procUser << " | " << compUser << " | average: " << average << endl;
+    // std::cout << "MatchAvg:  " << current[0].matchAvg << endl;
+    // std::cout << procUser << " | " << compUser << " | average: " << average << endl;
 }
 
 
 void processFile(fs::path processFile, fs::path compareFile) {
 //    cout << "Process File:" << processFile.string() << endl;
 //    cout << "Compare File:" << compareFile.string() << endl;
-
-
-
-
 //    string inPath =
 //    string path =
 
@@ -96,7 +132,7 @@ void processFile(fs::path processFile, fs::path compareFile) {
 
 
     int samples = 0;
-    if (in1.is_open() && in2.is_open()) {
+    if(in1.is_open() && in2.is_open()) {
         while (getline(in1, line1) && getline(in2, line2)) {
             samples++;
             for (int i = 0; i < line1.length(); i++) {
@@ -156,13 +192,13 @@ void processFile(fs::path processFile, fs::path compareFile) {
     string tempName2 = compareFile.filename().string();
     string compareUser = tempName2.substr(0, tempName2.find_last_of('_'));
 
-    cout << processUser << endl;
-    cout << compareUser << endl;
+    cout << "Processed User ID: " << processUser << endl;
+    cout << "Compared User ID: " << compareUser << endl;
 
     storeMatches(processUser, compareUser, (sqrSums / (float) samples));
 
 //    cout << "Samples: " << samples << endl;
-    cout << "AVERAGE = " << sqrSums / (float)samples;
+    cout << "AVERAGE = " << sqrSums / (float)samples << endl << endl;
 
 }
 
@@ -185,33 +221,42 @@ int main() {
     cout << "Process: " << procDir << endl;
     cout << "UserScan: " << userScans << endl;
 
-    for (const auto &entry_1: fs::directory_iterator(procDir)) {
-        currFileName = entry_1.path().string();
-        currProcFile = currFileName.at(currFileName.length() - 5);
+    for (const auto &type: fs::directory_iterator(procDir)) {
+        currFileName = type.path().string();
+        currProcFile = toupper(currFileName.at(currFileName.rfind('/') + 1));
         cout << "===================================================================================================="
              << endl;
 
-//        cout << "File Path:" << currFileName << endl;   // Debug
-//        cout << "File Types:" << currProcFile << endl;  // Debug
+        cout << "File Path:" << currFileName << endl;   // Debug
+        cout << "File Types:" << currProcFile << endl;  // Debug
 
 
 
         userScans /= targetFolder(currProcFile);
         cout << "  =====================" + userScans.string() + "===================" << endl;  // Debug
 
+        procDir /= targetFolder(currProcFile);
+        cout << "  =====================" + procDir.string() + "===================" << endl;  // Debug
 
-        for (const auto &entry: fs::directory_iterator(userScans)) {
-//            cout << entry.path() << endl;
-            processFile(entry_1, entry);
-
-
+        for(const auto &entry_1: fs::directory_iterator(type))
+        {
+            for (const auto &entry_2: fs::directory_iterator(userScans)) {
+                // cout << entry_1.path() << endl;
+                // cout << entry_1 << ' ' << entry << endl;
+                processFile(entry_1, entry_2);
+            }
         }
 
         while (userScans.filename() != "user_scans") {
             userScans = userScans.parent_path();
         }
+        while (procDir.filename() != "process_scans") {
+            procDir = procDir.parent_path();
+        }
         cout << endl << endl;
-
     }
+
+    viewAllMatches();
+
     return 0;
 }

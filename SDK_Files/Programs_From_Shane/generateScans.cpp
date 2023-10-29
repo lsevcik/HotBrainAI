@@ -2,14 +2,13 @@
 // Created by shane on 10/6/2023.
 //
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <random>
-
 #include <filesystem>
 using namespace std;
-
 namespace fs = filesystem;
 
 
@@ -139,6 +138,7 @@ int main() {
                     out << "," << generateRandomDouble(-1.0, 1.0);
                     out << "," << p+1 << endl;
                 }
+                
             } else {
                 cout << "Unable to open file";
                 return -1;
