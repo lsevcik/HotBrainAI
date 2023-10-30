@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ super() }}- QR Code{% endblock %}
+{% block head %}
+{{ super() }}
+<style type="text/css">
+    svg {
+        font-size: 50px;
+    }
+</style>
+{% endblock %}
+{% block body %}
+{% autoescape false %}
+{{ g.img }}
+{% endautoescape %}
+{% endblock %}
