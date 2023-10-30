@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ super() }}- Survery{% endblock %}
+{% block title %}{{ super() }}- Profile{% endblock %}
 {% block head %}
 {{ super() }}
 <style type="text/css">
@@ -11,10 +11,6 @@
 {% block body %}
 <div class="survey">
     <form action="post">
-
-        <label for="fname">Phone Number (will be your user ID):</label><br>
-        <input type="number" id="pnum" name="pnum" value="" minlength="7"><br>
-
         <p>Gender Identity:</p>
         <input type="radio" id="trans" name="gi" value="TRANS">
         <label for="trans">Trans</label><br>
@@ -42,8 +38,6 @@
         <label for="female">Female</label><br>
         <input type="checkbox" id="nonbinary" name="sex" value="NONBINARY">
         <label for="nonbinary">Nonbinary</label><br>
-        <input type="checkbox" id="open" name="sex" value="OPENTOALL">
-        <label for="open">Male</label><br><br>
 
         <input type="submit" value="Submit">
     </form>

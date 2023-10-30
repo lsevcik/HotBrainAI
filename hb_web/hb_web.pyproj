@@ -16,7 +16,7 @@
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>hb_web</Name>
     <RootNamespace>hb_web</RootNamespace>
-    <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|hotbrain_py|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,7 +32,7 @@
     <Compile Include="models\match.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="models\result.py" />
+    <Compile Include="models\datapoint.py" />
     <Compile Include="models\user.py" />
     <Compile Include="models\__init__.py" />
     <Compile Include="routes\api\open\login.py" />
@@ -41,9 +41,6 @@
     <Compile Include="routes\api\scanner\get_video_for_user.py" />
     <Compile Include="routes\api\scanner\put_results.py" />
     <Compile Include="routes\api\scanner\__init__.py" />
-    <Compile Include="routes\api\user\get_matches.py" />
-    <Compile Include="routes\api\user\post_survery.py" />
-    <Compile Include="routes\api\user\__init__.py" />
     <Compile Include="routes\api\__init__.py" />
     <Compile Include="tools\config.py" />
   </ItemGroup>
@@ -58,6 +55,7 @@
     <Content Include="templates\index.html" />
     <Content Include="templates\login.html" />
     <Content Include="templates\matches.html" />
+    <Content Include="templates\qr.html" />
     <Content Include="templates\survey.html" />
     <Content Include="tools\__pycache__\config.cpython-39.pyc" />
     <Content Include="tools\__pycache__\db_con.cpython-39.pyc" />
@@ -73,17 +71,16 @@
     <Folder Include="routes\api\" />
     <Folder Include="routes\api\open\" />
     <Folder Include="routes\api\scanner\" />
-    <Folder Include="routes\api\user\" />
     <Folder Include="static\" />
     <Folder Include="templates\" />
     <Folder Include="tools\" />
     <Folder Include="tools\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="env\">
-      <Id>env</Id>
+    <Interpreter Include="hotbrain_py\">
+      <Id>hotbrain_py</Id>
       <Version>3.11</Version>
-      <Description>env (Python 3.11)</Description>
+      <Description>hotbrain_py (Python 3.11)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
