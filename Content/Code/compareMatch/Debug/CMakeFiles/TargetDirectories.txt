@@ -1,3 +1,0 @@
-K:/HotBrainAI/Content/Code/compareMatch/Debug/CMakeFiles/compareMatch.dir
-K:/HotBrainAI/Content/Code/compareMatch/Debug/CMakeFiles/edit_cache.dir
-K:/HotBrainAI/Content/Code/compareMatch/Debug/CMakeFiles/rebuild_cache.dir

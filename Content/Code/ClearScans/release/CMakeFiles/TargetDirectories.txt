@@ -1,3 +1,0 @@
-K:/HotBrainAI/Content/Code/ClearScans/release/CMakeFiles/ClearScans.dir
-K:/HotBrainAI/Content/Code/ClearScans/release/CMakeFiles/edit_cache.dir
-K:/HotBrainAI/Content/Code/ClearScans/release/CMakeFiles/rebuild_cache.dir

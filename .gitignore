@@ -174,3 +174,5 @@ SDK_Files/.vscode/tasks.json
 
 # Ignore c++ a.out
 a.out
+
+.vs
