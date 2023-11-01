@@ -1,5 +1,5 @@
-from neurosdk.scanner import Scanner
-from neurosdk.cmn_types import *
+from sdk_tools.scanner import Scanner
+from cmn_types import *
 import concurrent.futures
 from time import sleep
 import ctypes
@@ -8,7 +8,9 @@ import cv2
 import csv
 import os
 import shutil
+import subprocess
 import requests
+from turtle import textinput
 
 # Event handler for scan finding a headband, prints sensor info
 def sensor_found(scanner, sensors):
@@ -45,7 +47,7 @@ def displayMsg():
 def playVideo():
 # def playVideo(videoName):
     # Define variables
-    videoName = "Videos\HotBrain_Test_Video.mp4" # Name of the video file
+    videoName = "Videos\\HotBrain_Test_Video.mp4" # Name of the video file
     windowName = "TEST VIDEO" # Name of the video window
     
     # Create a fullscreen window for playing a video
@@ -117,27 +119,42 @@ def createOutputCSV():
     os.remove("output.txt") # Delete temporary text file
 
     shutil.move(f'{fdout.name}', f'Processing/{fdout.name}') # Moves the newly created CSV file to processing folder
-    
-
+ 
+# Attempts to get the video urls from the server
 def getVideoUrl():
-    url = "url_to_server" # ToDo: Get the url where we receive video data from server
-    videoUrl = requests.get(url)
+    url = "http://localhost:8080" # ToDo: Get the url where we receive video data from server
+    token = textinput("Get Token", "Please enter your token")
+    response = requests.get(url, headers={'Authorization':f'Bearer {token}'})
 
-    if videoUrl:
-        return videoUrl
+    print(response)
 
-# Attempts to send a datafile to the server
+    # if videoUrl:
+    #     return videoUrl
+
+# # Attempts to send a datafile to the server
 def sendFileToServer(fileName):
     dataFile = open(fileName, "rb") # Open the dataFile
-    url = "url_to_server" # ToDo: Get the url where we want to post the csv files
+    url = "http://localhost:8080/api/scanner" # ToDo: Get the url where we want to post the csv files
     submission = requests.post(url, files = {"form_field_name": dataFile}) # ToDo: Get the form_field_name from server
     
-    if submission.ok: # Checks if the file was submitted 
-        return True
-    else:
-        return False
+    print(submission)
 
-if __name__ == "__main__":
+    # if submission.ok: # Checks if the file was submitted 
+    #     return True
+    # else:
+    #     return False
+
+try:
+    token = textinput("Get Token", "Please enter your token")
+    # getVideoUrl()
+    # sendFileToServer("output.csv")
+    # Runs the generatescans and clearscans programs
+    # os.chdir('Programs_From_Shane')
+    # subprocess.call(args='start', executable='GenerateScans.exe')
+    # os.chdir('user_scans')
+    # subprocess.call(args='start', executable='ClearScans.exe')
+    # os.chdir('..\..')
+
     scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
     scanner.sensorsChanged = sensor_found # Call event handler for sensor found
@@ -202,3 +219,7 @@ if __name__ == "__main__":
         del sensor # Garbage collection for sensor
 
     del scanner # Garbage collection for scanner
+
+# Print any errors
+except Exception as err:
+    print(err)
