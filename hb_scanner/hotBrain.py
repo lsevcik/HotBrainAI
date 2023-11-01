@@ -1,5 +1,5 @@
-from scanner import Scanner
-from cmn_types import *
+from neurosdk.scanner import Scanner
+from neurosdk.cmn_types import *
 import concurrent.futures
 from time import sleep
 import ctypes
@@ -8,7 +8,6 @@ import cv2
 import csv
 import os
 import shutil
-import subprocess
 import requests
 
 # Event handler for scan finding a headband, prints sensor info
@@ -120,32 +119,25 @@ def createOutputCSV():
     shutil.move(f'{fdout.name}', f'Processing/{fdout.name}') # Moves the newly created CSV file to processing folder
     
 
-# def getVideoUrl():
-#     url = "url_to_server" # ToDo: Get the url where we receive video data from server
-#     videoUrl = requests.get(url)
+def getVideoUrl():
+    url = "url_to_server" # ToDo: Get the url where we receive video data from server
+    videoUrl = requests.get(url)
 
-#     if videoUrl:
-#         return videoUrl
+    if videoUrl:
+        return videoUrl
 
-# # Attempts to send a datafile to the server
-# def sendFileToServer(fileName):
-#     dataFile = open(fileName, "rb") # Open the dataFile
-#     url = "url_to_server" # ToDo: Get the url where we want to post the csv files
-#     submission = requests.post(url, files = {"form_field_name": dataFile}) # ToDo: Get the form_field_name from server
+# Attempts to send a datafile to the server
+def sendFileToServer(fileName):
+    dataFile = open(fileName, "rb") # Open the dataFile
+    url = "url_to_server" # ToDo: Get the url where we want to post the csv files
+    submission = requests.post(url, files = {"form_field_name": dataFile}) # ToDo: Get the form_field_name from server
     
-#     if submission.ok: # Checks if the file was submitted 
-#         return True
-#     else:
-#         return False
+    if submission.ok: # Checks if the file was submitted 
+        return True
+    else:
+        return False
 
-try:
-    # Runs the generatescans and clearscans programs
-    os.chdir('Programs_From_Shane')
-    subprocess.call(args='start', executable='GenerateScans.exe')
-    os.chdir('user_scans')
-    # subprocess.call(args='start', executable='ClearScans.exe')
-    os.chdir('..\..')
-
+if __name__ == "__main__":
     scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
     scanner.sensorsChanged = sensor_found # Call event handler for sensor found
@@ -210,7 +202,3 @@ try:
         del sensor # Garbage collection for sensor
 
     del scanner # Garbage collection for scanner
-
-# Print any errors
-except Exception as err:
-    print(err)

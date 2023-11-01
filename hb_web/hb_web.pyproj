@@ -16,7 +16,8 @@
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>hb_web</Name>
     <RootNamespace>hb_web</RootNamespace>
-    <InterpreterId>MSBuild|hotbrain_py|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>
+    </InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,17 +80,6 @@
     <Folder Include="templates\" />
     <Folder Include="tools\" />
     <Folder Include="tools\__pycache__\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Interpreter Include="hotbrain_py\">
-      <Id>hotbrain_py</Id>
-      <Version>3.11</Version>
-      <Description>hotbrain_py (Python 3.11)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-      <Architecture>X64</Architecture>
-    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 
