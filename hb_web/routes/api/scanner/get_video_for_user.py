@@ -1,8 +1,18 @@
-from flask import g
+from flask import g, request, current_app
+from sqlalchemy import select
+from sqlalchemy.orm.session import Session
+from database import engine
+from models import User
 
 
 def handle_request():
-    if g.jwt["role"] is not "scanner":
-        return {}, 401
+    if not request.authorization and request.authorization.type != "bearer":
+        return {}, 400
+    
+    with Session(engine) as session:
+        stmt = select(User).where(User.id == request.authorization.token)
+        result = session.execute(stmt)
+        user = result.scalar_one_or_none()
+        current_app.logger.debug(user.seeking)
 
     return {"videos": [""]}

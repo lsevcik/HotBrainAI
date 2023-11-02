@@ -1,6 +1,6 @@
 import enum
 import bcrypt
-from sqlalchemy import Column, ForeignKey, Identity, Integer, String, Enum, select
+from sqlalchemy import Boolean, Column, ForeignKey, Identity, Integer, String, Enum, select
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from database import Base, engine
 
@@ -29,7 +29,6 @@ class Seeking(enum.Enum):
 
 class UserSeeking(Base):
     __tablename__ = "users_seeking"
-    id: Mapped[int] = mapped_column(primary_key=True)
     user_id = mapped_column(ForeignKey("users.id"), primary_key=True)
     seeking = Column(Enum(Seeking), primary_key=True)
 
@@ -45,6 +44,7 @@ class User(Base):
     gender_class = Column(Enum(GenderClass))
     gender = Column(Enum(Gender))
     seeking: Mapped[list["UserSeeking"]] = relationship()
+    only_cisgender = Column(Boolean())
 
     def __init__(
         self,
@@ -76,7 +76,7 @@ def login(username, **kwargs):
         return user
     else:
         return None
-
+    
 def register(**kwargs):
     session = Session(engine)
     default_admin = User(

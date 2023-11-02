@@ -1,7 +1,9 @@
-from flask import Flask, redirect, render_template, session, url_for, g
+from modulefinder import AddPackagePath
+from flask import Flask, redirect, render_template, request, session, url_for, g
 from sqlalchemy import select
 import qrcode
 import qrcode.image.svg
+from models.user import User, Gender, GenderClass, Seeking, UserSeeking
 
 from routes.api import api
 from database import db_session
@@ -32,11 +34,38 @@ def login():
     return render_template("login.html")
 
 
-@app.route("/survey")
+@app.route("/survey", methods=["GET", "POST"])
 def survey():
     if not session.get("logged_in", False):
         redirect(url_for("login"))
-    return render_template("survey.html")
+        
+    stmt = select(User).where(User.id == session.get("user_userid"))
+    result = db_session.execute(stmt)
+    user = result.scalar_one_or_none()
+
+    if (request.method == "GET"):
+        g.user = user
+        g.user_seeking = [str(s.seeking) for s in user.seeking]
+        return render_template("survey.html")
+    
+    app.logger.debug(request.form)
+    
+    user.first_name = request.form["fname"]
+    user.last_name = request.form["lname"]
+    user.gender = Gender[request.form["gr"]]
+    user.gender_class = GenderClass[request.form["gi"]]
+    user.only_cisgender = request.form["interest"] == "YES"
+
+    stmt = UserSeeking.__table__.delete().where(UserSeeking.user_id == user.id)
+    db_session.execute(stmt)
+
+    db_session.flush()
+    for s in request.form.getlist("sex"):
+        user.seeking += [UserSeeking(user_id=user.id, seeking=Seeking[s])]
+        
+    db_session.commit()
+    
+    return redirect(url_for("survey"))
 
 
 @app.route("/matches")
