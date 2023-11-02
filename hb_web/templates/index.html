@@ -3,15 +3,14 @@
 <h1>
     Welcome to Hot Brain
 </h1>
-
+<h2>
+    {% if session.get("logged_in", False) %}
+        Welcome {{ session.get("user_username") }}
+    {% endif %}
+</h2>
 <p>
-    <h2>
-        {% if session.get("logged_in", False) %}
-        Welcome {{ session.get("user_username") }} <br />
-        {% endif %}
-        Calm your mind.<br />
-        Relax your thoughts.<br />
-        React naturally.<br />
-    </h2>
+    Calm your mind.<br />
+    Relax your thoughts.<br />
+    React naturally.
 </p>
 {% endblock %}
