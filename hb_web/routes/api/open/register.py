@@ -1,6 +1,6 @@
-from flask import redirect, request, current_app, abort, url_for
+from flask import flash, redirect, request, current_app, abort, url_for
 
-from models.user import User
+from models.user import register
 
 from psycopg2.errors import UniqueViolation
 
@@ -13,11 +13,12 @@ def handle_request():
 
     # Create the user's account
     try:
-        User.register(
+        register(
             username=request.form["username"], password=request.form["password"]
         )
     except UniqueViolation:  # Username already taken
-        abort(409)
+        flash("Username already in use.")
+        return redirect(url_for("login"))
 
-    # Return JWT to authenticated user
+    flash("You have successfully registered. You may now log in.")
     return redirect(url_for("login"))

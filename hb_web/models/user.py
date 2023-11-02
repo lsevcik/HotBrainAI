@@ -77,6 +77,18 @@ def login(username, **kwargs):
     else:
         return None
 
+def register(**kwargs):
+    session = Session(engine)
+    default_admin = User(
+        username=kwargs.get("username"),
+        password=bcrypt.hashpw(kwargs.get("password").encode("UTF-8"), bcrypt.gensalt()),
+        role=Role.USER,
+        first_name="",
+        last_name="",
+    )
+    session.add(default_admin)
+    session.commit()
+
 
 def create_default_admin():
     session = Session(engine)

@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, flash, redirect, session, url_for
 
 from . import login, register
 
@@ -13,3 +13,9 @@ def handle_login():
 @api_open.post("/register")
 def handle_register():
     return register.handle_request()
+
+@api_open.route("/logout")
+def logout():
+    session.clear()
+    flash("You have been logged out.")
+    return redirect(url_for("index"))
