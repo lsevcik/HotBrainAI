@@ -3,14 +3,13 @@
 <h1>
     Welcome to Hot Brain
 </h1>
-<h2>
-    {% if session.get("logged_in", False) %}
-        Welcome {{ session.get("user_username") }}
-    {% endif %}
-</h2>
-<p>
-    Calm your mind.<br />
-    Relax your thoughts.<br />
-    React naturally.
+
+<p class="pic">
+    <img src="/static/images/hblogo.png" width="400px" height="400px" alt="hotbrain logo picture">
 </p>
+
+<h2>
+    Calm your mind. Relax your thoughts. React naturally.
+</h2>
+
 {% endblock %}
