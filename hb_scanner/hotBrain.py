@@ -10,7 +10,12 @@ import os
 import shutil
 import subprocess
 import requests
-from turtle import textinput
+import turtle
+import configparser
+
+# Read config file for server communication
+config = configparser.ConfigParser()
+config.read(r'config.cfg')
 
 # Event handler for scan finding a headband, prints sensor info
 def sensor_found(scanner, sensors):
@@ -122,39 +127,21 @@ def createOutputCSV():
  
 # Attempts to get the video urls from the server
 def getVideoUrl():
-    url = "http://localhost:8080" # ToDo: Get the url where we receive video data from server
-    token = textinput("Get Token", "Please enter your token")
-    response = requests.get(url, headers={'Authorization':f'Bearer {token}'})
+    url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Video')
+    token = turtle.simpledialog.askstring("Get Token", "Please enter your token")
+    response = requests.post(url, headers={'Authorization':f'Bearer {token}'})
 
     print(response)
 
-    # if videoUrl:
-    #     return videoUrl
-
 # # Attempts to send a datafile to the server
 def sendFileToServer(fileName):
-    dataFile = open(fileName, "rb") # Open the dataFile
-    url = "http://localhost:8080/api/scanner" # ToDo: Get the url where we want to post the csv files
-    submission = requests.post(url, files = {"form_field_name": dataFile}) # ToDo: Get the form_field_name from server
+    dataFile = open(fileName, "rb") # Open the dataFile as a binary file
+    url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Results')
+    submission = requests.post(url, data=dataFile)
     
     print(submission)
 
-    # if submission.ok: # Checks if the file was submitted 
-    #     return True
-    # else:
-    #     return False
-
 try:
-    token = textinput("Get Token", "Please enter your token")
-    # getVideoUrl()
-    # sendFileToServer("output.csv")
-    # Runs the generatescans and clearscans programs
-    # os.chdir('Programs_From_Shane')
-    # subprocess.call(args='start', executable='GenerateScans.exe')
-    # os.chdir('user_scans')
-    # subprocess.call(args='start', executable='ClearScans.exe')
-    # os.chdir('..\..')
-
     scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
     scanner.sensorsChanged = sensor_found # Call event handler for sensor found
