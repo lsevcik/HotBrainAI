@@ -1,4 +1,6 @@
 <ul>
+    <li><a {% if request.endpoint=="index" %} class="active" {% endif %} href="{{ url_for('index') }}">Home</a></li>
+    <li><a {% if request.endpoint=="about" %} class="active" {% endif %} href="{{ url_for('about') }}">About HB</a></li>
     {% if session.get("logged_in") %}
     <li><a {% if request.endpoint=="qr" %} class="active" {% endif %} href="{{ url_for('qr') }}">QR Code</a></li>
     <li><a {% if request.endpoint=="matches" %} class="active" {% endif %} href="{{ url_for('matches') }}">Matches</a></li>
