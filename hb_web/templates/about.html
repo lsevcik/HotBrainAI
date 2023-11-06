@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ super() }}- About{% endblock %}
 {% block body %}
 
 <p id="aboutus"> About Hot Brain</p>
@@ -6,15 +7,15 @@
 <div class="container">
 
     <div class="inner">
-        <img id="slide" src="/static/images/brainbit.jpg">
+        <img id="slide" src="{{ url_for('static', filename='images/brainbit.jpg') }}">
         <div id="slidetext">Are you tired of swiping and filling out endless forms to find a person who you can vibe with?</div>
     </div>
 
-    <img src="/static/images/next.png" id="next" onclick="next()">
-    <img src="/static/images/prev.png" id="prev" onclick="prev()">
+    <img src="{{ url_for('static', filename='images/next.png') }}" id="next" onclick="next()">
+    <img src="{{ url_for('static', filename='images/prev.png') }}" id="prev" onclick="prev()">
 
 </div>
-<script type="text/javascript" src="/static/js/javascript.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/slider.js') }}"></script>
 
 
 

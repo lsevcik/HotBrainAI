@@ -52,6 +52,7 @@
     <Content Include="static\images\brain.jpg" />
     <Content Include="static\images\favicon.ico" />
     <Content Include="static\styles\style.css" />
+    <Content Include="templates\about.html" />
     <Content Include="templates\bar.html" />
     <Content Include="templates\base.html" />
     <Content Include="templates\index.html" />
