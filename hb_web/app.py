@@ -1,22 +1,26 @@
-from modulefinder import AddPackagePath
 from flask import Flask, redirect, render_template, request, session, url_for, g
 from sqlalchemy import select
 import qrcode
 import qrcode.image.svg
-from models.user import User, Gender, GenderClass, Seeking, UserSeeking
 
 from routes.api import api
-from database import db_session
 
-import models
+from models.datapoint import *
+from models.match import *
+from models.user import *
+from database import db_session, init_db
 
 app = Flask(__name__)
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
-# Import contents of config.cfg to app.config
-app.config.from_pyfile("config.cfg")
+# Create config
+try:
+    app.config.from_pyfile(filename="config.cfg")
+except OSError:
+    app.logger.warning("Failed to load config.cfg")
+app.config.from_prefixed_env()
 
 # Set loglevel to debug
 app.logger.setLevel(10)  # DEBUG
@@ -76,10 +80,10 @@ def matches():
     if not session.get("logged_in", False):
         redirect(url_for("login"))
     stmt = (
-        select(models.Match)
+        select(Match)
         .where(
-            models.Match.user1 == session.get("user_userid")
-            or models.Match.user2 == session.get("user_userid")
+            Match.user1 == session.get("user_userid")
+            or Match.user2 == session.get("user_userid")
         )
         .limit(10)
     )
@@ -124,4 +128,5 @@ if __name__ == "__main__":
         PORT = int(os.environ.get("SERVER_PORT", "8080"))
     except ValueError:
         PORT = 8080
+    init_db()
     app.run(HOST, PORT)

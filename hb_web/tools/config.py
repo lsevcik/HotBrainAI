@@ -4,7 +4,12 @@ from os import path
 
 def get_config():
     config = Config(path.join(path.dirname(__file__), ".."))
-    config.from_pyfile(filename="config.cfg")
+    try:
+        config.from_pyfile(filename="config.cfg")
+    except OSError:
+        print("Failed to load config.cfg")
+    config.from_prefixed_env()
+    
     return config
 
 

@@ -2,7 +2,7 @@ from flask import g, request, current_app
 from sqlalchemy import select
 from sqlalchemy.orm.session import Session
 from database import engine
-from models import User
+from models.user import *
 
 
 def handle_request():

@@ -34,7 +34,6 @@
     </Compile>
     <Compile Include="models\datapoint.py" />
     <Compile Include="models\user.py" />
-    <Compile Include="models\__init__.py" />
     <Compile Include="routes\api\open\login.py" />
     <Compile Include="routes\api\open\register.py" />
     <Compile Include="routes\api\open\__init__.py" />
@@ -48,6 +47,9 @@
     <Content Include=".gitignore" />
     <Content Include="config.cfg" />
     <Content Include="config.cfg.example" />
+    <Content Include="docker-compose.yml" />
+    <Content Include="Dockerfile" />
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
     <Content Include="static\images\brain.jpg" />
     <Content Include="static\images\favicon.ico" />
