@@ -31,10 +31,6 @@ def on_signal_data_received(sensor, data):
     for i in range(len(data)):
         print(data[i].PackNum, data[i].O1, data[i].O2, data[i].T3, data[i].T4)
 
-# Event handler for resist data being recieved
-# def on_resist_data_received(sensor, data):
-#     print(data)
-
 # Event handler for electrode state being changed
 def on_electrodes_state_changed(sensor, data):
     print(data)
@@ -163,22 +159,20 @@ def checkDirs():
 
 # Runs the GenerateScans executable from data_tools
 def generateScanData():
+    checkDirs()
     subprocess.call(args='start', executable='data_tools/generate_build/GenerateScans.exe') # Run the algorithm
 
 # Runs the ClearScans executable from data_tools
 def clearScanData():
+    checkDirs()
     subprocess.call(args='start', executable='data_tools/clear_build/ClearScans.exe') # Run the algorithm
 
 # Runs the compareMatch executable from data_tools
 def compareMatches():
+    checkDirs()
     subprocess.call(args='start', executable='data_tools/compare_build/compareMatch.exe') # Run the algorithm
 
 try:
-    # checkDirs() # Checks to ensure that user_scans and process_scans directories exist
-    # generateScanData() # Generates a specified amount of random scan data in both directories
-    # compareMatches() # Runs the comparison algorithm to show example
-    # clearScanData() # Clears the data generated
-
     scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
     scanner.sensorsChanged = sensor_found # Call event handler for sensor found
@@ -210,9 +204,6 @@ try:
         if sensor.is_supported_feature(SensorFeature.FeatureSignal):
             sensor.signalDataReceived = on_signal_data_received
 
-        # if sensor.is_supported_feature(SensorFeature.FeatureResist):
-        #     sensor.resistDataReceived = on_resist_data_received
-
         # videoName = getVideoUrl()
 
         # Creates a temporary text file for parsing the data
@@ -230,13 +221,6 @@ try:
         createOutputCSV() # Create the CSV file from output text
 
         # sendFileToServer(dataFile)
-
-        # if sensor.is_supported_command(SensorCommand.CommandStartResist):
-        #     sensor.exec_command(SensorCommand.CommandStartResist)
-        #     print("Start resist")
-        #     sleep(5)
-        #     sensor.exec_command(SensorCommand.CommandStopResist)
-        #     print("Stop resist")
 
         sensor.disconnect()
         print("Disconnect from sensor")
