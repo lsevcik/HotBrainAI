@@ -122,20 +122,14 @@ def getVideoUrl():
     response = requests.get(url, headers={'Authorization':f'Bearer {token}'})
 
     # print(response) # DEBUG
-    return response.json()
+    return response.json(), token
 
 # Attempts to send a datafile to the server
-def sendFileToServer(fileName):
+def sendFileToServer(fileName, type):
     dataFile = open(fileName, "rb") # Open the dataFile as a binary file
-
-    #TODO: Confirm that this allows the video type to be displayed
-    type = fileName.split('/')
-    type = type[5].split('.')
-    type = type[0]
 
     url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Results')
 
-    #TODO: Add a header to the URL to indicate the video watched by the user
     submission = requests.post(url, data=dataFile, headers = {"VIDEO_TYPE": f"{type}"})
     
     print(submission)
@@ -176,21 +170,22 @@ def compareMatches():
     subprocess.call(args='start', executable='data_tools/compare_build/compareMatch.exe') # Run the algorithm
 
 try:
-    # TESTING (Properly gets each url from the server!)
-    # urls = getVideoUrl()
-    # print(urls)
+    # TESTING - Plays each video in succession similar to actual process
+    # videoURLs, token = getVideoUrl() # Get the URLs for each video based on user preference
+    # print(videoURLs) # DEBUG  
 
-    # videoURL = config.get('VIDEO_URL', 'URL')
-    # videoURL += urls['videos'][1]
+    # # Loop through each video and play for the user
+    # for video in videoURLs['videos']:
+    #     videoURL = config.get('VIDEO_URL', 'URL') # Add the path
+    #     videoURL += video # Get the video type
 
-    # print(videoURL)
+    #     print(videoURL)
 
-    # type = videoURL.split('/')
-    # type = type[5].split('.')
-    # type = type[0]
-    # print(type)
+    #     type = videoURL.split('/')[5].split('.')[0] # Get the video type
 
-    # playVideo(videoURL, type)
+    #     print(type)
+    #     displayMsg()
+    #     playVideo(videoURL, type)
 
     scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
@@ -223,28 +218,33 @@ try:
         if sensor.is_supported_feature(SensorFeature.FeatureSignal):
             sensor.signalDataReceived = on_signal_data_received
 
-        #TODO: videoURLs = getVideoUrl() -> Waiting on algo from Shane
-        # Sends a list of URLs to the videos on the server (http://localhost:8080/static/videos/_.mp4)
-        #TODO: Determine how many videos are being played
-        #TODO: Create a loop to play each video for the user
+        # START TO USER INTERACTION - PLAY VIDEO, CREATE DATA FILE, SEND FILE TO SERVER
+        videoURLs, token = getVideoUrl() # Get the URLs for each video based on user preference
+        print(videoURLs) # DEBUG  
 
-        # Creates a temporary text file for parsing the data
-        with open('output.txt', 'w', newline='') as dataFile:
-            if sensor.is_supported_command(SensorCommand.CommandStartSignal):
-                sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
-                
-                displayMsg() # Get the user ready with a message
-                sys.stdout = dataFile  # Redirect stdout to the file
-                playVideo() # Play the customer's video
-                sys.stdout = sys.__stdout__ # Stop redirect
+        # Loop through each video and play for the user
+        for video in videoURLs['videos']:
+            videoURL = config.get('VIDEO_URL', 'URL') # Add the path
+            videoURL += video # Get the video type
 
-                sensor.exec_command(SensorCommand.CommandStopSignal)
+            type = videoURL.split('/')[5].split('.')[0] # Get the video type
 
-        #TODO: Determine based on the video the name of the output file
-        fileName = "output.txt"
-        createOutputCSV(fileName) # Create the CSV file from output text
+            # Creates a temporary text file for parsing the data
+            with open('output.txt', 'w', newline='') as dataFile:
+                if sensor.is_supported_command(SensorCommand.CommandStartSignal):
+                    sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
+                    
+                    displayMsg() # Get the user ready with a message
+                    sys.stdout = dataFile  # Redirect stdout to the file
+                    playVideo(videoURL, type) # Play the customer's video
+                    sys.stdout = sys.__stdout__ # Stop redirect
 
-        #TODO: sendFileToServer(dataFile) -> Waiting on process from Logan
+                    sensor.exec_command(SensorCommand.CommandStopSignal)
+
+            fileName = f"{token}.{type}.txt" # Create the file name based on USER_ID and VIDEO_TYPE
+            createOutputCSV(fileName) # Create the CSV file from output text
+
+            sendFileToServer(dataFile, type) # Attempt to send the file to the server
 
         sensor.disconnect()
         print("Disconnect from sensor")
