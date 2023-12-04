@@ -45,17 +45,14 @@ def displayMsg():
     ctypes.windll.user32.MessageBoxW(0, "Ready to Proceed?", "Alert", 1)
 
 # Function to play a video for testing the headband
-def playVideo():
-# def playVideo(videoName):
-    # Define variables
-    videoName = "Videos\\HotBrain_Test_Video.mp4" # Name of the video file
-    windowName = "TEST VIDEO" # Name of the video window
+def playVideo(videoURL, type):
+    windowName = str(type) # Name of the video window (video type)
     
     # Create a fullscreen window for playing a video
     cv2.namedWindow(windowName, cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-    cap = cv2.VideoCapture(videoName)  # Start capture
+    cap = cv2.VideoCapture(videoURL)  # Start capture
     
     # Check if the video exists, exit if not
     if not cap.isOpened():
@@ -81,15 +78,14 @@ def playVideo():
     cv2.destroyAllWindows() # Remove the window
 
 # Opens the text file to parse the data and creates a csv file with the parsed data
-def createOutputCSV():
-# def createOutputCSV(dataFile):
-    with open('output.txt') as fdin, open('output.csv', 'w', newline='') as fdout:
-        wr = csv.DictWriter(fdout, fieldnames=['Sample', 'O1', 'O2', 'T3', 'T4'],
+def createOutputCSV(fileName):
+    with open(fileName) as fdin, open('output.csv', 'w', newline='') as fdout:
+        wr = csv.DictWriter(fdout, fieldnames=['O1', 'O2', 'T3', 'T4'],
                             extrasaction='ignore')  # Create header and ignore unwanted fields
         wr.writeheader() # write the header line
 
         row = {} # Initialize empty dictionary for the row
-        count = 1 # Loop counter
+        # count = 1 # Loop counter (For testing purposes)
 
         # Read the data file line by line and parse data for csv file
         while True:
@@ -103,37 +99,44 @@ def createOutputCSV():
             # print("PackNum: ", data[0]) # For testing purposes
 
             # Add sample # and electrode data to row values
-            Sample = count
+            # Sample = count (For testing purposes)
             o1 = data[1]
             o2 = data[2]
             t3 = data[3]
             t4 = data[4].strip('\n') # Strip very last data point's new line character
 
             # Create a row
-            row = {wr.fieldnames[0]: Sample, wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4}
+            row = {wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4}
 
-            count += 1 # Update loop counter
+            # count += 1 # Update loop counter (For testing purposes)
 
             if len(row) != 0: # Check if a row has been parsed then add to the csv file
                 wr.writerow(row)
 
-    os.remove("output.txt") # Delete temporary text file
-
-    shutil.move(f'{fdout.name}', f'Processing/{fdout.name}') # Moves the newly created CSV file to processing folder
+    os.remove(fileName) # Delete temporary text file
  
 # Attempts to get the video urls from the server
 def getVideoUrl():
     url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Video')
     token = turtle.simpledialog.askstring("Get Token", "Please enter your token")
-    response = requests.post(url, headers={'Authorization':f'Bearer {token}'})
+    response = requests.get(url, headers={'Authorization':f'Bearer {token}'})
 
-    print(response)
+    # print(response) # DEBUG
+    return response.json()
 
-# # Attempts to send a datafile to the server
+# Attempts to send a datafile to the server
 def sendFileToServer(fileName):
     dataFile = open(fileName, "rb") # Open the dataFile as a binary file
+
+    #TODO: Confirm that this allows the video type to be displayed
+    type = fileName.split('/')
+    type = type[5].split('.')
+    type = type[0]
+
     url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Results')
-    submission = requests.post(url, data=dataFile)
+
+    #TODO: Add a header to the URL to indicate the video watched by the user
+    submission = requests.post(url, data=dataFile, headers = {"VIDEO_TYPE": f"{type}"})
     
     print(submission)
 
@@ -157,22 +160,38 @@ def checkDirs():
         if not os.path.isdir(f'process_scans\\{dir}'):
             os.makedirs(f'process_scans\\{dir}')
 
-# Runs the GenerateScans executable from data_tools
+# Runs the GenerateScans executable from data_tools (For Testing purposes)
 def generateScanData():
     checkDirs()
     subprocess.call(args='start', executable='data_tools/generate_build/GenerateScans.exe') # Run the algorithm
 
-# Runs the ClearScans executable from data_tools
+# Runs the ClearScans executable from data_tools (For testing purposes)
 def clearScanData():
     checkDirs()
     subprocess.call(args='start', executable='data_tools/clear_build/ClearScans.exe') # Run the algorithm
 
-# Runs the compareMatch executable from data_tools
+# Runs the compareMatch executable from data_tools (Used for creating match table)
 def compareMatches():
     checkDirs()
     subprocess.call(args='start', executable='data_tools/compare_build/compareMatch.exe') # Run the algorithm
 
 try:
+    # TESTING (Properly gets each url from the server!)
+    # urls = getVideoUrl()
+    # print(urls)
+
+    # videoURL = config.get('VIDEO_URL', 'URL')
+    # videoURL += urls['videos'][1]
+
+    # print(videoURL)
+
+    # type = videoURL.split('/')
+    # type = type[5].split('.')
+    # type = type[0]
+    # print(type)
+
+    # playVideo(videoURL, type)
+
     scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
     scanner.sensorsChanged = sensor_found # Call event handler for sensor found
@@ -204,7 +223,10 @@ try:
         if sensor.is_supported_feature(SensorFeature.FeatureSignal):
             sensor.signalDataReceived = on_signal_data_received
 
-        # videoName = getVideoUrl()
+        #TODO: videoURLs = getVideoUrl() -> Waiting on algo from Shane
+        # Sends a list of URLs to the videos on the server (http://localhost:8080/static/videos/_.mp4)
+        #TODO: Determine how many videos are being played
+        #TODO: Create a loop to play each video for the user
 
         # Creates a temporary text file for parsing the data
         with open('output.txt', 'w', newline='') as dataFile:
@@ -218,9 +240,11 @@ try:
 
                 sensor.exec_command(SensorCommand.CommandStopSignal)
 
-        createOutputCSV() # Create the CSV file from output text
+        #TODO: Determine based on the video the name of the output file
+        fileName = "output.txt"
+        createOutputCSV(fileName) # Create the CSV file from output text
 
-        # sendFileToServer(dataFile)
+        #TODO: sendFileToServer(dataFile) -> Waiting on process from Logan
 
         sensor.disconnect()
         print("Disconnect from sensor")
