@@ -11,8 +11,6 @@
 using namespace std;
 namespace fs = filesystem;
 
-const int MAX_MATCHES = 10; // For checking if user has more than 10 matches already
-
 /**
  * @brief Struct containing user info
  * userMatchID is the ID of the user in user_scans being matched with processed
@@ -68,6 +66,32 @@ string targetFolder(char vid) {
 }
 
 /**
+ * @brief Checks allMatches vector for the current processed user in case their match already exists 
+ *        If it finds an existing match it will update the average and return true (false if not)
+ * 
+ * @param compUser 
+ * @param it1 
+ * @param avg
+ * @return bool
+ */
+bool find_matchUser_ID(string compUser, float avg, vector<user>::iterator it1)
+{
+    vector<userMatch>::iterator it2;
+    bool flag = false;
+
+    for(it2 = it1->allMatches.begin(); it2 != it1->allMatches.end() && !flag; it2++)
+        {
+            if(it2->userMatchID == compUser)
+            {
+                it2->matchAvg = (it2->matchAvg + avg) / 2;
+                flag = true;
+            }
+        }
+
+    return flag;
+}
+
+/**
  * @brief Checks allUserMatches vector for the current processed user in case they already exist
  * 
  * @param procUser 
@@ -91,14 +115,17 @@ vector<user>::iterator find_user_ID(string procUser)
  */
 void viewAllMatches()
 {
-    std::cout << "Processed User ID | Compared User ID | Average" << endl; // Table header
+    // std::cout << "Processed User ID | Compared User ID | Average" << endl; // Table header (DEBUG)
+
+    ofstream fout;
+    fout.open("output.txt");
 
     // Loop through all processed users and display their matched users and averages
     for(vector<user>::iterator it1 = allUserMatches.begin(); it1 != allUserMatches.end(); it1++)
     {
         for(vector<userMatch>::iterator it2 = it1->allMatches.begin(); it2 != it1->allMatches.end(); it2++)
         {
-            std::cout << setw(14) << it1->userID << setw(18) << it2->userMatchID << setw(14) << it2->matchAvg << endl; // Display info
+            fout << it1->userID << ' ' << it2->userMatchID << ' ' << it2->matchAvg << endl; // Display info
         }
     }
 }
@@ -112,6 +139,8 @@ void viewAllMatches()
  */
 void storeMatches(string procUser, string compUser, float average){
     
+    bool flag;
+
     // Store the match if needed in a vector
     vector<userMatch> currentMatch;
     currentMatch.push_back({compUser, average});
@@ -120,8 +149,13 @@ void storeMatches(string procUser, string compUser, float average){
 
     if(it != allUserMatches.end()) // User already in set
     {
-        it->allMatches.push_back({compUser, average}); // Add match to it's set
-        it->size++;
+        flag = find_matchUser_ID(compUser, average, it);
+        
+        if(!flag)
+        {
+            it->allMatches.push_back({compUser, average}); // Add match to it's set
+            it->size++;
+        }
     } 
     else // User not in set
         allUserMatches.push_back({procUser, currentMatch, 1}); // Add user and it's match to the set, also update the size
@@ -176,10 +210,13 @@ void processFile(fs::path processFile, fs::path compareFile) {
                 }
             }
             for (int i = 0; i < line2.length(); i++) {
-                if (line2.at(i) == ',') {
+                if (line2.at(i) == ',' || line2.at(i) == '\n') {
                     commas2.push_back(i);
                 }
             }
+
+            commas1.push_back(line1.length() - 1);
+            commas2.push_back(line2.length() - 1);
 
             O1_1 = stof(string(&line1[0], &line1[commas1.at(0)]));
             O1_2 = stof(string(&line2[0], &line2[commas2.at(0)]));
@@ -196,6 +233,7 @@ void processFile(fs::path processFile, fs::path compareFile) {
 
             T4_1 = stof(string(&line1[commas1.at(2) + 1], &line1[commas1.at(3)]));
             T4_2 = stof(string(&line2[commas2.at(2) + 1], &line2[commas2.at(3)]));
+
             T4 = powf((T4_1 - T4_2), 2);
 
             sum = O1 + O2 + T3 + T4;

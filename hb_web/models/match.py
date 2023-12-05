@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Identity, Integer
+from sqlalchemy import Column, ForeignKey, Identity, Integer, Float
 from sqlalchemy.orm import mapped_column
 from database import Base
 
@@ -8,7 +8,7 @@ class Match(Base):
     id = Column("id", Integer, Identity(), primary_key=True)
     user1 = mapped_column(ForeignKey("users.id"))
     user2 = mapped_column(ForeignKey("users.id"))
-    score = Column("score", Integer)
+    score = Column("score", Float)
 
     def __init__(self, user1=None, user2=None, score=0):
         self.user1 = user1

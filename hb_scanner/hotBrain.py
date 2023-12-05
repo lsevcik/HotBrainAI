@@ -29,7 +29,7 @@ def on_sensor_state_changed(sensor, state):
 # Event handler for signal data being recieved
 def on_signal_data_received(sensor, data):
     for i in range(len(data)):
-        print(data[i].PackNum, data[i].O1, data[i].O2, data[i].T3, data[i].T4)
+        print(data[i].O1, data[i].O2, data[i].T3, data[i].T4)
 
 # Event handler for electrode state being changed
 def on_electrodes_state_changed(sensor, data):
@@ -78,14 +78,13 @@ def playVideo(videoURL, type):
     cv2.destroyAllWindows() # Remove the window
 
 # Opens the text file to parse the data and creates a csv file with the parsed data
-def createOutputCSV(fileName):
-    with open(fileName) as fdin, open('output.csv', 'w', newline='') as fdout:
+def createOutputCSV(inputFile, type):
+    outputFile = inputFile.strip(".txt") + ".csv"
+    with open(inputFile) as fdin, open(outputFile, 'w', newline='') as fdout:
         wr = csv.DictWriter(fdout, fieldnames=['O1', 'O2', 'T3', 'T4'],
                             extrasaction='ignore')  # Create header and ignore unwanted fields
-        wr.writeheader() # write the header line
 
         row = {} # Initialize empty dictionary for the row
-        # count = 1 # Loop counter (For testing purposes)
 
         # Read the data file line by line and parse data for csv file
         while True:
@@ -96,24 +95,23 @@ def createOutputCSV(fileName):
             
             data = data.split(' ') # Split up 01, 02, T3, T4
 
-            # print("PackNum: ", data[0]) # For testing purposes
-
             # Add sample # and electrode data to row values
-            # Sample = count (For testing purposes)
-            o1 = data[1]
-            o2 = data[2]
-            t3 = data[3]
-            t4 = data[4].strip('\n') # Strip very last data point's new line character
+            o1 = data[0]
+            o2 = data[1]
+            t3 = data[2]
+            t4 = data[3].strip('\n') # Strip very last data point's new line character
 
             # Create a row
-            row = {wr.fieldnames[1]: o1, wr.fieldnames[2]: o2, wr.fieldnames[3]: t3, wr.fieldnames[4]: t4}
-
-            # count += 1 # Update loop counter (For testing purposes)
+            row = {wr.fieldnames[0]: o1, wr.fieldnames[1]: o2, wr.fieldnames[2]: t3, wr.fieldnames[3]: t4}
 
             if len(row) != 0: # Check if a row has been parsed then add to the csv file
                 wr.writerow(row)
 
-    os.remove(fileName) # Delete temporary text file
+    shutil.move(f'{outputFile}', f'process_scans/{type.lower()}') # Moves the newly created CSV file to processing folder
+
+    os.remove(inputFile) # Delete temporary text file
+
+    return outputFile # Return the name of the output file
  
 # Attempts to get the video urls from the server
 def getVideoUrl():
@@ -125,14 +123,14 @@ def getVideoUrl():
     return response.json(), token
 
 # Attempts to send a datafile to the server
-def sendFileToServer(fileName, type):
+def sendFileToServer(fileName, token):
     dataFile = open(fileName, "rb") # Open the dataFile as a binary file
 
     url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Results')
 
-    submission = requests.post(url, data=dataFile, headers = {"VIDEO_TYPE": f"{type}"})
+    requests.post(url, data=dataFile, headers={'Authorization': f'Bearer {token}'})
     
-    print(submission)
+    # print(response) # DEBUG
 
 # Checks directories for matching names
 # Need standard, trad, female, male inside user_scans and process_scans
@@ -169,89 +167,130 @@ def compareMatches():
     checkDirs()
     subprocess.call(args='start', executable='data_tools/compare_build/compareMatch.exe') # Run the algorithm
 
-try:
-    # TESTING - Plays each video in succession similar to actual process
-    # videoURLs, token = getVideoUrl() # Get the URLs for each video based on user preference
-    # print(videoURLs) # DEBUG  
+# Moves all data files from process_scans directory to user_scans directory
+def moveProcessedFiles(files):
+    for file in files:
+        shutil.move(f"process_scans/{file[1].lower()}/{file[0]}", f'user_scans/{file[1].lower()}')
 
-    # # Loop through each video and play for the user
-    # for video in videoURLs['videos']:
-    #     videoURL = config.get('VIDEO_URL', 'URL') # Add the path
-    #     videoURL += video # Get the video type
+# Creates the data file from compareMatch output for sending to the server
+def createMatchesFile(token):
+    # Create input and output file names
+    inputFile = f"{token}.txt"
+    os.rename("output.txt", inputFile)
+    outputFile = inputFile.strip(".txt") + ".csv"
 
-    #     print(videoURL)
+    # Read the input file and convert to csv
+    with open(inputFile) as fdin, open(outputFile, 'w', newline='') as fdout:
+        wr = csv.DictWriter(fdout, fieldnames=['user1', 'user2', 'score'],
+                            extrasaction='ignore')  # Create header and ignore unwanted fields
 
-    #     type = videoURL.split('/')[5].split('.')[0] # Get the video type
+        row = {} # Initialize empty dictionary for the row
 
-    #     print(type)
-    #     displayMsg()
-    #     playVideo(videoURL, type)
+        # Read the data file line by line and parse data for csv file
+        while True:
+            data = fdin.readline() # Get the next line
 
-    scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
+            if not data:
+                break
 
-    scanner.sensorsChanged = sensor_found # Call event handler for sensor found
-    
-    # Search for the headband
-    scanner.start()
-    print("Starting search...")
-    while len(scanner.sensors()) == 0:
-        sleep(1)
-    scanner.stop()
+            data = data.split(' ') # Split up user1, user2, score
 
-    # Loop while the device is connected and run all features
-    sensorsInfo = scanner.sensors()
-    for i in range(len(sensorsInfo)):
-        current_sensor_info = sensorsInfo[i]
-        print(sensorsInfo[i])
+            # Add user1, user2, and score info
+            user1 = data[0]
+            user2 = data[1]
+            score = data[2].strip('\n') # Strip very last data point's new line character
 
-        # Start thread pool and connect device
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(device_connection, current_sensor_info)
-            sensor = future.result()
-            print("Device connected")
+            # Create a row
+            row = {wr.fieldnames[0]: user1, wr.fieldnames[1]: user2, wr.fieldnames[2]: score}
 
-        sensor.sensorStateChanged = on_sensor_state_changed # Call event handler for state change (connected)
+            if len(row) != 0: # Check if a row has been parsed then add to the csv file
+                wr.writerow(row)
 
-        sensFamily = sensor.sens_family
+    os.remove(inputFile) # Remove the inputFile
 
-        # Start the signal data feature
-        if sensor.is_supported_feature(SensorFeature.FeatureSignal):
-            sensor.signalDataReceived = on_signal_data_received
+    return outputFile # Return the name of the new CSV file
 
-        # START TO USER INTERACTION - PLAY VIDEO, CREATE DATA FILE, SEND FILE TO SERVER
-        videoURLs, token = getVideoUrl() # Get the URLs for each video based on user preference
-        print(videoURLs) # DEBUG  
+# TESTING:
+# files = [("5_S.csv", "Standard"), ("5_M.csv", "Male")]
+# token = "5"
+# compareMatches() # Run the match algorithm
+# dataFile = createMatchesFile(token) # Convert the dataFile to csv
+# sendFileToServer(dataFile, token)
+# moveProcessedFiles(files) # Move all files from process_scans to user_scans
 
-        # Loop through each video and play for the user
-        for video in videoURLs['videos']:
-            videoURL = config.get('VIDEO_URL', 'URL') # Add the path
-            videoURL += video # Get the video type
+# Get user information until there are no more users (exit program)
+while(True):
+    try:
+        scanner = Scanner([SensorFamily.SensorLEBrainBit]) # Check for headband sensors
 
-            type = videoURL.split('/')[5].split('.')[0] # Get the video type
+        scanner.sensorsChanged = sensor_found # Call event handler for sensor found
+        
+        # Search for the headband
+        scanner.start()
+        print("Starting search...")
+        while len(scanner.sensors()) == 0:
+            sleep(1)
+        scanner.stop()
 
-            # Creates a temporary text file for parsing the data
-            with open('output.txt', 'w', newline='') as dataFile:
-                if sensor.is_supported_command(SensorCommand.CommandStartSignal):
-                    sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
-                    
-                    displayMsg() # Get the user ready with a message
-                    sys.stdout = dataFile  # Redirect stdout to the file
-                    playVideo(videoURL, type) # Play the customer's video
-                    sys.stdout = sys.__stdout__ # Stop redirect
+        # Loop while the device is connected and run all features
+        sensorsInfo = scanner.sensors()
+        for i in range(len(sensorsInfo)):
+            current_sensor_info = sensorsInfo[i]
+            print(sensorsInfo[i])
 
-                    sensor.exec_command(SensorCommand.CommandStopSignal)
+            # Start thread pool and connect device
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(device_connection, current_sensor_info)
+                sensor = future.result()
+                print("Device connected")
 
-            fileName = f"{token}.{type}.txt" # Create the file name based on USER_ID and VIDEO_TYPE
-            createOutputCSV(fileName) # Create the CSV file from output text
+            sensor.sensorStateChanged = on_sensor_state_changed # Call event handler for state change (connected)
 
-            sendFileToServer(dataFile, type) # Attempt to send the file to the server
+            sensFamily = sensor.sens_family
 
-        sensor.disconnect()
-        print("Disconnect from sensor")
-        del sensor # Garbage collection for sensor
+            # START TO USER INTERACTION - PLAY VIDEO(S), CREATE DATA FILE(S)
+            videoURLs, token = getVideoUrl() # Get the URLs for each video based on user preference
+            files = [] # Stores all process file names and their types
 
-    del scanner # Garbage collection for scanner
+            # Loop through each video and play for the user
+            for video in videoURLs['videos']:
 
-# Print any errors
-except Exception as err:
-    print(err)
+                # Start the signal data feature
+                if sensor.is_supported_feature(SensorFeature.FeatureSignal):
+                    sensor.signalDataReceived = on_signal_data_received
+
+                videoURL = config.get('VIDEO_URL', 'URL') # Add the path
+                videoURL += video # Get the video type
+                type = videoURL.split('/')[5].split('.')[0] # Get the video type
+                fileName = f"{token}_{type[0]}.txt" # Create the file name based on USER_ID and VIDEO_TYPE
+
+                # Creates a temporary text file for parsing the data
+                with open(fileName, 'w', newline='') as dataFile:
+                    if sensor.is_supported_command(SensorCommand.CommandStartSignal):
+                        sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
+                        
+                        displayMsg() # Get the user ready with a message
+                        sys.stdout = dataFile  # Redirect stdout to the file
+                        playVideo(videoURL, type) # Play the customer's video
+                        sys.stdout = sys.__stdout__ # Stop redirect
+
+                        sensor.exec_command(SensorCommand.CommandStopSignal)
+
+                outputFile = createOutputCSV(fileName, type) # Create the CSV file from output text
+                files.append((outputFile, type)) # Add the current file name and its type to the list
+
+            # END TO USER INTERACTION: RUN ALGO, CREATE FINAL DATA FILE, SEND TO SERVER, MOVE PROCESSED FILES
+            compareMatches() # Run the match algorithm
+            dataFile = createMatchesFile(token) # Convert the dataFile to csv
+            sendFileToServer(dataFile) # Attempt to send the file to the server
+            moveProcessedFiles(files) # Move all files from process_scans to user_scans
+
+            sensor.disconnect()
+            print("Disconnect from sensor")
+            del sensor # Garbage collection for sensor
+
+        del scanner # Garbage collection for scanner
+
+    # Print any errors
+    except Exception as err:
+        print(err)

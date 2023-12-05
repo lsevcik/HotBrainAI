@@ -139,8 +139,7 @@ void generateRandomData(fs::path name, int currentSamples)
             out << generateRandomDouble(-1.0, 1.0);
             out << "," << generateRandomDouble(-1.0, 1.0);
             out << "," << generateRandomDouble(-1.0, 1.0);
-            out << "," << generateRandomDouble(-1.0, 1.0);
-            out << "," << p+1 << endl;
+            out << "," << generateRandomDouble(-1.0, 1.0) << endl;
         }  
     } else // Otherwise, exit the program
     {

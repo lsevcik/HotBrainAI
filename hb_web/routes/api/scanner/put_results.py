@@ -27,7 +27,7 @@ def handle_request():
             m = Match(
                 user1=match[0],
                 user2=match[1],
-                score=match[3]
+                score=match[2]
                 )
             session.add(m)
 
