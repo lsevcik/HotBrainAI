@@ -23,4 +23,4 @@ def handle_request():
     session["user_username"] = user.username
 
     # Return to user
-    return redirect(url_for("index"))
+    return redirect(url_for("survey"))
