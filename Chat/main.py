@@ -2,12 +2,9 @@ from flask import Blueprint, Flask, render_template, request, session, redirect,
 from flask_socketio import join_room, leave_room, send, SocketIO
 import random
 from string import ascii_uppercase
+from app.py import socketio
 
-#chatroom = Blueprint("chatroom", __name__)
-
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "hjhjsdahhds"
-socketio = SocketIO(app)
+chatroom = Blueprint("chatroom", __name__)
 
 rooms = {}
 
@@ -22,7 +19,7 @@ def generate_unique_code(length):
     
     return code
 
-@app.route("/", methods=["POST", "GET"])
+@chatroom.route("/", methods=["POST", "GET"])
 def homeScreen():
     session.clear()
     if request.method == "POST":
@@ -52,7 +49,7 @@ def homeScreen():
 
     return render_template("home.html")
 
-@app.route("/room")
+@chatroom.route("/room")
 def room():
     room = session.get("room")
     if room is None or session.get("name") is None or room not in rooms:
@@ -94,4 +91,4 @@ def disconnect():
     leave_room(room)
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    socketio.run(chatroom, debug=True)
