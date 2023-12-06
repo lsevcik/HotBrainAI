@@ -1,0 +1,3 @@
+pyneurosdk2
+opencv-python
+requests

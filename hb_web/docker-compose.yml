@@ -1,0 +1,23 @@
+services:
+  web:
+    build:
+      context: .
+      tags:
+        - "hotbrain:latest"
+    ports:
+      - "8080:8080"
+    environment:
+      FLASK_POSTGRES_DB: "hotbrain"
+      FLASK_POSTGRES_USERNAME: "hotbrain"
+      FLASK_POSTGRES_PASSWORD: "hotbrain"
+      FLASK_POSTGRES_HOST: "db"
+      FLASK_SECRET_KEY: "ceaed873fc0b48cdcf89090385ec8af4bddde0ff19919fbcc49ecf139605d4b7"
+      SERVER_HOST: "0.0.0.0"
+    depends_on:
+      - "db"
+  db:
+    image: "postgres:latest"
+    environment:
+      POSTGRES_USER: "hotbrain"
+      POSTGRES_DB: "hotbrain"
+      POSTGRES_PASSWORD: "hotbrain"

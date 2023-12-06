@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ super() }}- Matches{% endblock %}
+{% block head %}
+{{ super() }}
+<style type="text/css">
+    table {
+        margin: 0 auto;
+        font-size: large;
+        border: 2px solid black;
+    }
+</style>
+{% endblock %}
+{% block body %}
+
+<table border='1'>
+    <caption>Matches</caption>
+    <tr><th>User</th><th>Match Rating</th></tr>
+    {% for m in g.matches %}
+    <tr><td>{{ m[0].user2 }}</td><td>{{ m[0].score }}</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

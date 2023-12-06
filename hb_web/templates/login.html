@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ super() }}- Login{% endblock %}
+{% block head %}
+{{ super() }}
+
+<style>
+    h2{
+        display: inline-block;
+        padding: 100px;
+    }
+</style>
+{% endblock %}
+{% block body %}
+<h2>Login
+<form method="post" action="{{ url_for('api.api_open.handle_login') }}">
+    <label for="username">Username: </label>
+    <input type="text" name="username" /> <br />
+    <label for="password">Password: </label>
+    <input type="password" name="password" /><br />
+    <input type="submit" />
+</form>
+</h2>
+
+
+<h2>Register
+<form method="post" action="{{ url_for('api.api_open.handle_register') }}">
+    <label for="username">Username: </label>
+    <input type="text" name="username" /><br />
+    <label for="password">Password: </label>
+    <input type="password" name="password" /><br />
+    <input type="submit" />
+</form>
+
+</h2>
+<p style="font-size:20px">New users after registration will be directed to a survey, please fill this out promptly!</p>
+{% endblock %}

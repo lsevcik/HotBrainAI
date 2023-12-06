@@ -1,0 +1,37 @@
+_id: req_e9d41579dc1b4f54aa8790788b712b22
+type: Request
+parentId: fld_ec370d1e7797408192d737f0268125e8
+modified: 1696999652675
+created: 1696978719277
+url: "{{ _.scheme }}://{{ _.host }}/api/open/login"
+name: Login
+description: ""
+method: POST
+body:
+  mimeType: application/x-www-form-urlencoded
+  params:
+    - id: pair_6289e9773a994b84a22147eebe9cf22e
+      name: username
+      value: admin
+      description: ""
+    - id: pair_f9d2795b5b58467c87bebeec7ef45000
+      name: password
+      value: admin
+      description: ""
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/x-www-form-urlencoded
+  - name: User-Agent
+    value: insomnia/2023.5.8
+authentication:
+  type: bearer
+  token: ""
+metaSortKey: -1696999652635
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
