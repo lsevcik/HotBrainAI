@@ -9,15 +9,17 @@
 </style>
 {% endblock %}
 {% block body %}
-<div class="survey">
-    <form method="post">
-        <p>User Information:</p>
-        <label for="fname">First Name: </label>
-        <input type="text" id="fname" name="fname" value="{{ g.user.first_name }}" />
-        <label for="lname">Last Name: </label>
-        <input type="text" id="lname" name="lname" value="{{ g.user.last_name }}" />
 
-        <p>Gender Identity:</p>
+<div class="survey">
+    <div class = "box">
+    <form method="post">
+        <p style="font-weight: bold; font-size:larger">User Information:</p>
+        <label for="fname">First Name: </label>
+        <input type="text" size="15" id="fname" name="fname" value="{{ g.user.first_name }}" /><br />
+        <label for="lname">Last Name: &nbsp; </label>
+        <input type="text" size="15" id="lname" name="lname" value="{{ g.user.last_name }}" /><br />
+
+        <p style="font-weight: bold; font-size:larger">Gender Identity:</p>
         <input type="radio" id="gi_trans" name="gi" value="TRANSGENDER" {{ "checked" if g.user.gender_class.__str__() == "GenderClass.TRANSGENDER" }} />
         <label for="gi_trans">Trans</label><br />
         <input type="radio" id="gi_cis" name="gi" value="CISGENDER" {{ "checked" if g.user.gender_class.__str__() == "GenderClass.CISGENDER" }} />
@@ -25,19 +27,19 @@
         <input type="radio" id="gi_nonbinary" name="gi" value="OTHER" {{ "checked" if g.user.gender_class.__str__() == "GenderClass.OTHER" }} />
         <label for="gi_nonbinary">Nonbinary</label><br />
 
-        <p>Gender Role:</p>
+        <p style="font-weight: bold; font-size:larger">Gender Role:</p>
         <input type="radio" id="gr_male" name="gr" value="MALE" {{ "checked" if g.user.gender.__str__() == "Gender.MALE" }} />
         <label for="gr_male">Male</label><br />
         <input type="radio" id="gr_female" name="gr" value="FEMALE" {{ "checked" if g.user.gender.__str__() == "Gender.FEMALE" }} />
         <label for="gr_female">Female</label><br />
 
-        <p>Are You Only Interested In Cisgender?</p>
+        <p style="font-weight: bold; font-size:larger">Are You Only Interested In Cisgender?</p>
         <input type="radio" id="yes" name="interest" value="YES" {{ "checked" if g.user.only_cisgender }} />
         <label for="yes">Yes</label><br />
         <input type="radio" id="no" name="interest" value="NO" {{ "checked" if not g.user.only_cisgender }} />
         <label for="no">No</label><br />
 
-        <p>Seeking: </p>
+        <p style="font-weight: bold; font-size:larger">Seeking: </p>
         <input type="checkbox" id="male" name="sex" value="MALE" {{ "checked" if "Seeking.MALE" in g.user_seeking }} />
         <label for="male">Male</label><br />
         <input type="checkbox" id="female" name="sex" value="FEMALE" {{ "checked" if "Seeking.FEMALE" in g.user_seeking }} />
@@ -45,7 +47,18 @@
         <input type="checkbox" id="nonbinary" name="sex" value="OTHER" {{ "checked" if "Seeking.OTHER" in g.user_seeking }} />
         <label for="nonbinary">Nonbinary</label><br />
 
-        <input type="submit" value="Submit">
+
+        <input id="button" type="submit" value="Submit" onclick="popup()">
+        <script>
+            document.getElementbyID('button').onclick = function(){
+                window.location.href="{{ url_for('qr') }}";
+            }
+            function popup(){
+                alert("You've submitted the form, now you may continue on to watch a short video!");
+            }
+        </script>
     </form>
+
+</div>
 </div>
 {% endblock %}
