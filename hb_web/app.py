@@ -1,5 +1,5 @@
 from flask import Flask, redirect, render_template, request, session, url_for, g
-from flask_socketio import SocketIO
+#from flask_socketio import SocketIO
 from sqlalchemy import select
 import qrcode
 import qrcode.image.svg
@@ -12,7 +12,7 @@ from models.user import *
 from database import db_session, init_db
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app

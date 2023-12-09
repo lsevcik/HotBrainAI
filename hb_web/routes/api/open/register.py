@@ -1,6 +1,7 @@
-from flask import flash, redirect, request, current_app, abort, url_for
+from flask import flash, redirect, request, current_app, abort, url_for, session
 
 from models.user import register
+from models.user import login
 
 from psycopg2.errors import UniqueViolation
 
@@ -20,5 +21,13 @@ def handle_request():
         flash("Username already in use.")
         return redirect(url_for("login"))
 
-    flash("You have successfully registered. You may now log in.")
-    return redirect(url_for("login"))
+    # Log the user in
+    user = login(request.form["username"], password=request.form["password"])
+    if not user:
+        abort(401)
+
+    session["logged_in"] = True
+    session["user_userid"] = user.id
+    session["user_username"] = user.username
+
+    return redirect(url_for("survey"))
