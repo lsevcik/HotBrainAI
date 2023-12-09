@@ -8,9 +8,10 @@ class HB_GUI:
         self.sensor = sensor # Get the sensor object
 
         # Set background and active color palletes
-        self.bg_Color = _from_rgb((20, 32, 87))
-        self.ab_Color = _from_rgb((20, 32, 87))
-        self.fg_Color = _from_rgb((192, 28, 81))
+        self.bg_Color = _from_rgb((0, 11, 21))
+        self.ab_Color = _from_rgb((0, 11, 21))
+        self.fg_Color = _from_rgb((253,0,5))
+        self.yes_Color = _from_rgb((28, 94, 32))
 
         # Configure window
         self.root.title("HotBrain Data Collection")
@@ -19,7 +20,7 @@ class HB_GUI:
 
         # Set up main frame and welcome label
         self.mainFrame = tk.Frame(self.root, background=self.bg_Color)
-        self.mainFrame.pack(pady=100)
+        self.mainFrame.pack(pady=80)
         self.welcome_Lbl = tk.Label(self.mainFrame, text="Welcome to HotBrain!", font=("Sans-Serif", 50, "bold"), 
                                     background=self.bg_Color, fg=self.fg_Color)
         self.welcome_Lbl.pack()
@@ -40,16 +41,16 @@ class HB_GUI:
 
         # Create and place the buttons
         self.btnFrame = tk.Frame(self.mainFrame, background=self.bg_Color)
-        self.btnFrame.pack(pady=10)
-        self.yesbtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.fg_Color)
+        self.btnFrame.pack(pady=20)
+        self.yesbtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.yes_Color)
         self.yesbtnFrame.pack(padx=50, side="left")
-        self.yesBtn = tk.PhotoImage(file="images/Yes_Button.png").subsample(2,2)
+        self.yesBtn = tk.PhotoImage(file="images/Yes_Button.png").subsample(3,3)
         self.collect_Yes_Btn = tk.Button(self.yesbtnFrame, image=self.yesBtn, borderwidth=0, 
                                          background=self.bg_Color, activebackground=self.ab_Color, command=self.startCollection)
         self.collect_Yes_Btn.pack()
         self.nobtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.fg_Color)
         self.nobtnFrame.pack(padx=50, side='right')
-        self.noBtn = tk.PhotoImage(file="images/No_Button.png").subsample(2,2)
+        self.noBtn = tk.PhotoImage(file="images/No_Button.png").subsample(3,3)
         self.collect_No_Btn = tk.Button(self.nobtnFrame, image=self.noBtn, borderwidth=0, 
                                         background=self.bg_Color, activebackground=self.ab_Color, command=self.root.destroy)
         self.collect_No_Btn.pack()
