@@ -8,8 +8,9 @@ class HB_GUI:
         self.sensor = sensor # Get the sensor object
 
         # Set background and active color palletes
-        self.bg_Color = "#add8e6"
-        self.ab_Color = "#add8e6"
+        self.bg_Color = _from_rgb((20, 32, 87))
+        self.ab_Color = _from_rgb((20, 32, 87))
+        self.fg_Color = _from_rgb((192, 28, 81))
 
         # Configure window
         self.root.title("HotBrain Data Collection")
@@ -20,7 +21,7 @@ class HB_GUI:
         self.mainFrame = tk.Frame(self.root, background=self.bg_Color)
         self.mainFrame.pack(pady=100)
         self.welcome_Lbl = tk.Label(self.mainFrame, text="Welcome to HotBrain!", font=("Sans-Serif", 50, "bold"), 
-                                    background=self.bg_Color)
+                                    background=self.bg_Color, fg=self.fg_Color)
         self.welcome_Lbl.pack()
 
         # Resize the logo image and place it on a canvas
@@ -34,19 +35,19 @@ class HB_GUI:
 
         # Set up the message for user input
         self.collect_Lbl = tk.Label(self.mainFrame, text="Would you like to collect HotBrain data?", 
-                                    font=("Sans-Serif", 25, "bold"), background=self.bg_Color)
+                                    font=("Sans-Serif", 25, "bold"), background=self.bg_Color, fg=self.fg_Color)
         self.collect_Lbl.pack()
 
         # Create and place the buttons
         self.btnFrame = tk.Frame(self.mainFrame, background=self.bg_Color)
         self.btnFrame.pack(pady=10)
-        self.yesbtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.bg_Color)
+        self.yesbtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.fg_Color)
         self.yesbtnFrame.pack(padx=50, side="left")
         self.yesBtn = tk.PhotoImage(file="images/Yes_Button.png").subsample(2,2)
         self.collect_Yes_Btn = tk.Button(self.yesbtnFrame, image=self.yesBtn, borderwidth=0, 
                                          background=self.bg_Color, activebackground=self.ab_Color, command=self.startCollection)
         self.collect_Yes_Btn.pack()
-        self.nobtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.bg_Color)
+        self.nobtnFrame = tk.Frame(self.btnFrame, relief="raised", borderwidth=7, background=self.fg_Color)
         self.nobtnFrame.pack(padx=50, side='right')
         self.noBtn = tk.PhotoImage(file="images/No_Button.png").subsample(2,2)
         self.collect_No_Btn = tk.Button(self.nobtnFrame, image=self.noBtn, borderwidth=0, 
@@ -62,6 +63,11 @@ class HB_GUI:
         # Test process for running the demo, ignores scanner info (COMMENT OUT)
         from hotBrain import demo
         demo()
+
+# Translates an rgb tuple of int to a tkinter friendly color code
+# Source: Stack Overflow -> https://stackoverflow.com/questions/51591456/can-i-use-rgb-in-tkinter
+def _from_rgb(rgb):
+    return "#%02x%02x%02x" % rgb  
 
 # Initializes the user interface after scan for headband is successful
 def initGUI(sensor):
