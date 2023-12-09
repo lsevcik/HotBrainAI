@@ -4,7 +4,9 @@ import concurrent.futures
 from time import sleep
 from hotBrain_tools.hotBrain_tools import displayMsg, playVideo, createOutputCSV, getVideoUrl, sendFileToServer, moveProcessedFiles, createMatchesFile
 from data_tools.processes import compareMatches
+from hotBrain_tools.hotBrain_GUI import HB_GUI
 import sys, configparser
+import tkinter as tk
 
 # Read config file for server communication
 config = configparser.ConfigParser()
@@ -57,7 +59,10 @@ def startUserProcess():
 
             sensor.sensorStateChanged = on_sensor_state_changed # Call event handler for state change (connected)
 
-            while(True): # TODO: Change this to a looping system
+            # Get user input for the below loop (until there are no more users to collect from)
+            user_input = input("Would you like to collect information (Y/N)? ")
+
+            while(user_input != "N"):
                 # START TO USER INTERACTION - PLAY VIDEO(S), CREATE DATA FILE(S)
                 videoURLs, token = getVideoUrl(config) # Get the URLs for each video based on user preference
                 files = [] # Stores all process file names and their types
@@ -95,15 +100,20 @@ def startUserProcess():
                 sendFileToServer(config, dataFile, token) # Attempt to send the file to the server
                 moveProcessedFiles(files) # Move all files from process_scans to user_scans
 
-                # TODO: Needs to disconnect after all users finished (after while loop from above)
-                # Disconnect the current sensor
-                sensor.disconnect()
-                print("Disconnect from sensor")
-                del sensor # Garbage collection for sensor
+                user_input = input("Would you like to collect information (Y/N)? ") # Get user input again
+
+            # Disconnect the current sensor
+            sensor.disconnect()
+            print("Disconnect from sensor")
+            del sensor # Garbage collection for sensor
 
         del scanner # Garbage collection for scanner
 
     # Print any errors
     except Exception as err:
         print(err)
-        
+
+if __name__ == '__main__':
+    root_window = tk.Tk() # Create main window
+    gui = HB_GUI(root_window) # Create GUI
+    root_window.mainloop() # Main loop
