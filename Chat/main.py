@@ -5,6 +5,9 @@ from string import ascii_uppercase
 from app.py import socketio
 
 chatroom = Blueprint("chatroom", __name__)
+#app = Flask(__name__)
+#app.config["SECRET_KEY"] = "abcd"
+#socketio = SocketIO(app)
 
 rooms = {}
 
@@ -20,7 +23,7 @@ def generate_unique_code(length):
     return code
 
 @chatroom.route("/", methods=["POST", "GET"])
-def homeScreen():
+def home():
     session.clear()
     if request.method == "POST":
         name = request.form.get("name")
@@ -35,12 +38,12 @@ def homeScreen():
             return render_template("home.html", error="Please enter a room code.", code=code, name=name)
         
         room = code
-        if create != False:
-            room = generate_unique_code(4)
-            rooms[room] = {"members": 0, "messages": []}
-        elif code not in rooms:
+        if code not in rooms:
             room = code
             rooms[room] = {"members": 0, "messages": []}
+        #elif code not in rooms:
+           # room = code
+           # rooms[room] = {"members": 0, "messages": []}
             #return render_template("home.html", error="Room does not exist.", code=code, name=name)
         
         session["room"] = room
