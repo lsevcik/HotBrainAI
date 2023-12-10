@@ -1,9 +1,10 @@
 import ctypes, cv2, csv, os, shutil, requests
+from tkinter import messagebox
 
 # Creates a simple message box window
 # Warns the user that the video is about to start
-def displayMsg():
-    ctypes.windll.user32.MessageBoxW(0, "Ready to Proceed?", "Alert", 1)
+def displayMsg(type):
+    messagebox.showwarning(f"{type}", "Ready to proceed?") # Display warning before video is shown
 
 # Function to play a video for testing the headband
 def playVideo(videoURL, type):

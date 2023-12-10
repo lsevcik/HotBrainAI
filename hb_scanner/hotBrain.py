@@ -53,7 +53,7 @@ def startUserProcess(HB_GUI, sensor):
             if sensor.is_supported_command(SensorCommand.CommandStartSignal):
                 sensor.exec_command(SensorCommand.CommandStartSignal) #this line prints the data
                 
-                displayMsg() # Get the user ready with a message
+                displayMsg(type) # Get the user ready with a message
                 sys.stdout = dataFile  # Redirect stdout to the file
                 playVideo(videoURL, type) # Play the customer's video
                 sys.stdout = sys.__stdout__ # Stop redirect
@@ -129,7 +129,7 @@ def demo(HB_GUI):
         type = videoURL.split('/')[5].split('.')[0] # Get the video type
         fileName = f"{token}_{type[0]}.txt" # Create the file name based on USER_ID and VIDEO_TYPE
 
-        displayMsg() # Get the user ready with a message
+        displayMsg(type) # Get the user ready with a message
         playVideo(videoURL, type) # Play the customer's video
 
         outputFile = fileName.strip(".txt") + ".csv"
