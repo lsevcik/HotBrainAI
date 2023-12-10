@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
-<div class="message-box">
-  <h2>Chat Room: {{code}}</h2>
+<div class="message-box" style = "background-color: rgb(20, 32, 87);">
+  <h2>Room Code: {{code}}</h2>
   <div class="messages" id="messages"></div>
   <div class="inputs">
     <input
@@ -9,8 +9,9 @@
       placeholder="Message"
       name="message"
       id="message"
+      style = "background-color: hotpink;"
     />
-    <button type="button" name="send" id="send-btn" onClick="sendMessage()">
+    <button style = "background-color: hotpink;" type="button" name="send" id="send-btn" onClick="sendMessage()">
       Send
     </button>
   </div>

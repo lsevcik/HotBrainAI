@@ -23,15 +23,15 @@
 }
 
 .message-box {
-  border-color: black;
+  border-color: hotpink;
   border-width: 2px;
   border-style: solid;
   border-radius: 10px;
   background-color: whitesmoke;
-  height: 80vh;
+  height: 95vh;
   display: flex;
   flex-direction: column;
-  width: 80vw;
+  width: 95vw;
   align-items: stretch;
 }
 
@@ -61,6 +61,7 @@ h2 {
   justify-content: space-between;
   padding-left: 10px;
   padding-right: 10px;
+  font-size: 20px;
 }
 
 .muted {
