@@ -1,4 +1,4 @@
-import ctypes, cv2, csv, os, shutil, requests, turtle
+import ctypes, cv2, csv, os, shutil, requests
 
 # Creates a simple message box window
 # Warns the user that the video is about to start
@@ -75,9 +75,9 @@ def createOutputCSV(inputFile, type):
     return outputFile # Return the name of the output file
  
 # Attempts to get the video urls from the server
-def getVideoUrl(config):
+def getVideoUrl(HB_GUI, config):
     url = config.get('WEB_URL', 'URL') + config.get('WEB_URL', 'Video')
-    token = turtle.simpledialog.askstring("Get Token", "Please enter your token")
+    token = HB_GUI.createTokenPopUp() # Create pop up window and get user input
     response = requests.get(url, headers={'Authorization':f'Bearer {token}'})
     return response.json(), token
 

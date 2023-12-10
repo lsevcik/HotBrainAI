@@ -7,10 +7,6 @@ from data_tools.processes import compareMatches
 from hotBrain_GUI import initGUI
 import sys, configparser
 
-# Read config file for server communication
-config = configparser.ConfigParser()
-config.read(r'config.cfg')
-
 # Event handler for scan finding a headband, prints sensor info
 def sensor_found(sensors):
     for index in range(len(sensors)):
@@ -31,9 +27,13 @@ def device_connection(sensor_info):
             
 # Main function that runs the backend process for HotBrain application
 # Get user information until there are no more users (exit program)
-def startUserProcess(sensor):
+def startUserProcess(HB_GUI, sensor):
+    # Read config file for server communication
+    config = configparser.ConfigParser()
+    config.read(r'config.cfg')
+
     # START TO USER INTERACTION - PLAY VIDEO(S), CREATE DATA FILE(S)
-    videoURLs, token = getVideoUrl(config) # Get the URLs for each video based on user preference
+    videoURLs, token = getVideoUrl(HB_GUI, config) # Get the URLs for each video based on user preference
     files = [] # Stores all process file names and their types
 
     # Loop through each video and play for the user
@@ -113,9 +113,13 @@ def startScan():
 
 # Runs through the regular process without needing the headband
 # Used for demo purposes only (COMMENT OUT)
-def demo():
+def demo(HB_GUI):
+    # Read config file for server communication
+    config = configparser.ConfigParser()
+    config.read(r'config.cfg')
+
     # START TO USER INTERACTION - PLAY VIDEO(S), CREATE DATA FILE(S)
-    videoURLs, token = getVideoUrl(config) # Get the URLs for each video based on user preference
+    videoURLs, token = getVideoUrl(HB_GUI, config) # Get the URLs for each video based on user preference
     files = [] # Stores all process file names and their types
 
     # Loop through each video and play for the user
@@ -141,4 +145,4 @@ def demo():
 if __name__ == "__main__":
     # startScan() # Starts scanning for the headband. If successful it will initialize the user interface
     
-    initGUI(sensor="") # For demo purposes, ignores headband scanning (COMMENT OUT)
+    initGUI(sensor=None) # For demo purposes, ignores headband scanning (COMMENT OUT)
