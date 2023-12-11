@@ -13,7 +13,7 @@
 
 <div class="wrapper">
     <table border='1'>
-        <caption style="font-size: 3em">Matches</caption>
+        <caption style="font-size: 3em; font-weight: bold">Matches</caption>
         <tr><th>User</th><th>Match Rating</th><th>Chat</th></tr>
         {% for m in g.matches %}
         <tr><td>{{ m[0].user2 }}</td><td>{{ m[0].score }}</td><td><a href="">Unite Brains</a></td></tr>
@@ -23,9 +23,9 @@
     <div class= "text">
     
         <ul>
-            <li>You matched with these other Hot Brains.</li><br><br>
-            <li>They are listed in decending order.</li><br><br>
-            <li>"Match Rating" shows how closely you both reacted to the video.</li> <br><br>
+            <li>You matched with these other Hot Brains!</li><br><br>
+            <li>They are listed in decending order of best to last.</li><br><br>
+            <li>"Match Rating" shows the variance between brain data of reaction to the video.</li> <br><br>
             <li>Click the "Unite Brains" link to message your match and see our product in action!</li>
         </ul>
     
