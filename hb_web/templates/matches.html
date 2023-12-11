@@ -4,19 +4,31 @@
 {{ super() }}
 <style type="text/css">
     table {
-        margin: 0 auto;
-        font-size: large;
-        border: 2px solid black;
+        border: 2px solid rgb(253, 253, 253);
     }
 </style>
 {% endblock %}
 {% block body %}
 
-<table border='1'>
-    <caption>Matches</caption>
-    <tr><th>User</th><th>Match Rating</th></tr>
-    {% for m in g.matches %}
-    <tr><td>{{ m[0].user2 }}</td><td>{{ m[0].score }}</td></tr>
-    {% endfor %}
-</table>
+
+<div class="wrapper">
+    <table border='1'>
+        <caption style="font-size: 3em">Matches</caption>
+        <tr><th>User</th><th>Match Rating</th><th>Chat</th></tr>
+        {% for m in g.matches %}
+        <tr><td>{{ m[0].user2 }}</td><td>{{ m[0].score }}</td><td><a href="">Unite Brains</a></td></tr>
+        {% endfor %}
+    </table>
+
+    <div class= "text">
+    
+        <ul>
+            <li>You matched with these other Hot Brains.</li><br><br>
+            <li>They are listed in decending order.</li><br><br>
+            <li>"Match Rating" shows how closely you both reacted to the video.</li> <br><br>
+            <li>Click the "Chat" button to message and see our product in action!</li>
+        </ul>
+    
+    </div>
+</div>
 {% endblock %}
