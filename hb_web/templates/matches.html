@@ -16,7 +16,7 @@
         <caption style="font-size: 3em; font-weight: bold">Matches</caption>
         <tr><th>User</th><th>Match Rating</th><th>Chat</th></tr>
         {% for m in g.matches %}
-        <tr><td>{{ m[0].user2 }}</td><td>{{ m[0].score }}</td><td><a href="">Unite Brains</a></td></tr>
+        <tr><td>{{ m[0] }}</td><td>{{ m[1] }}</td><td><a href="">Unite Brains</a></td></tr>
         {% endfor %}
     </table>
 

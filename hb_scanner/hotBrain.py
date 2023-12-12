@@ -5,7 +5,7 @@ from time import sleep
 from hotBrain_tools.hotBrain_tools import displayMsg, playVideo, createOutputCSV, getVideoUrl, sendFileToServer, moveProcessedFiles, createMatchesFile
 from data_tools.processes import compareMatches
 from hotBrain_GUI import initGUI
-import sys, configparser
+import sys, configparser, os
 
 # Event handler for scan finding a headband, prints sensor info
 def sensor_found(sensors):
@@ -63,12 +63,15 @@ def startUserProcess(HB_GUI, sensor):
         outputFile = createOutputCSV(fileName, type) # Create the CSV file from output text
         files.append((outputFile, type)) # Add the current file name and its type to the list
 
+    dataFile = ""
+
     # END TO USER INTERACTION: RUN ALGO, CREATE FINAL DATA FILE, SEND TO SERVER, MOVE PROCESSED FILES
     if int(token) > 1: # Check if this is the first user in the system
         compareMatches() # Run the match algorithm
         dataFile = createMatchesFile(token) # Convert the dataFile to csv
         sendFileToServer(config, dataFile, token) # Attempt to send the file to the server
     moveProcessedFiles(files) # Move all files from process_scans to user_scans
+    os.remove(dataFile)
 
 # Original SDK scanner process (will initialize the user interface upon connection)
 def startScan():
@@ -135,12 +138,15 @@ def demo(HB_GUI):
         outputFile = fileName.strip(".txt") + ".csv"
         files.append((outputFile, type)) # Add the current file name and its type to the list
 
+    dataFile = ""
+
     # END TO USER INTERACTION: RUN ALGO, CREATE FINAL DATA FILE, SEND TO SERVER, MOVE PROCESSED FILES
     if int(token) > 1: # Check if this is the first user in the system
         compareMatches() # Run the match algorithm
         dataFile = createMatchesFile(token) # Convert the dataFile to csv
         sendFileToServer(config, dataFile, token) # Attempt to send the file to the server
     moveProcessedFiles(files) # Move all files from process_scans to user_scans
+    os.remove(dataFile)
 
 if __name__ == "__main__":
     # startScan() # Starts scanning for the headband. If successful it will initialize the user interface

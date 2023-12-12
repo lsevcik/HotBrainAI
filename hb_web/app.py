@@ -11,6 +11,8 @@ from models.match import *
 from models.user import *
 from database import db_session, init_db
 
+from operator import itemgetter
+
 app = Flask(__name__)
 #socketio = SocketIO(app)
 
@@ -81,21 +83,90 @@ def survey():
 def matches():
     if not session.get("logged_in", False):
         redirect(url_for("login"))
+    
+    # SQL query to get all matches for current user (Match user_id and score)
     stmt = (
-        select(Match)
-        .where(
-            Match.user1 == session.get("user_userid")
-            or Match.user2 == session.get("user_userid")
+	    select(Match.user1, Match.score)
+        .where (
+            Match.user2 == session.get("user_userid")
+	    ).union (
+	        select(Match.user2, Match.score)
+            .where (
+                Match.user1 == session.get("user_userid")
+            )
         )
-        .limit(10)
     )
 
-    g.matches = db_session.execute(stmt).all()
+    g.matches = db_session.execute(stmt).all() # Execute the statement (get all matches)
 
-    app.logger.debug(g.matches)
+    user_info = getUserInfo() # Get relevant current user info as a list
+
+    # Parse out matches that do not fit preferences
+    for match in g.matches[:]:
+        parseMatches(match, user_info)
+
+    sortAndFilterMatches() # Sort the list by lowest score (closest distance) and remove all but top 10
 
     return render_template("matches.html")
 
+# Get relevant user info as a list for parsing match preferences
+def getUserInfo():
+    # SQL to get current user
+    stmt = select(User).where(User.id == session.get("user_userid"))
+    result = db_session.execute(stmt)
+    user = result.scalar_one_or_none()
+
+    # Grab only relevant info and place into a list
+    only_cis = user.only_cisgender
+    user_seeking = user.seeking
+    user_gender = str(user.gender).split('.')[1]
+    user_gender_class = str(user.gender_class).split('.')[1]
+    return [only_cis, user_seeking, user_gender, user_gender_class]
+
+# For each match, remove the ones that do not match both user and match preferences
+def parseMatches(match, user_info):
+    # SQL to get current match user info
+    stmt = select(User).where(User.id == match[0])
+    result = db_session.execute(stmt)
+    match_user = result.scalar_one_or_none()
+    match_gender_class = str(match_user.gender_class).split('.')[1]
+
+    # User ONLY wants Cis and Match is NOT Cis
+    if user_info[0] and match_gender_class != "CISGENDER":
+        g.matches.remove(match)
+
+    # Match ONLY wants Cis and User is NOT Cis
+    elif match_user.only_cisgender and user_info[3] != "CISGENDER":
+        g.matches.remove(match)
+
+    # Otherwise both user and match seeking preferences
+    else:
+        seeks = False
+
+        # For all user preferences, compare to match preferences
+        for u_preference in user_info[1]:
+            u_seeking = str(u_preference.seeking).split('.')[1]
+            match_gender = str(match_user.gender).split('.')[1]
+            if u_seeking == match_gender:
+                for m_preference in match_user.seeking:
+                    m_seeking = str(m_preference.seeking).split('.')[1]
+                    if m_seeking == user_info[2]:
+                        seeks = True
+
+        # If preferences do not match, remove from list
+        if not seeks:
+            g.matches.remove(match)
+
+# Sort the matches by best to worst scores (lowest->highest)
+# Only display top 10 (remove extra matches)
+def sortAndFilterMatches():
+    key = 1
+    g.matches.sort(key = itemgetter(key)) # Sort by score (ascending)
+
+    # Remove all extra matches from the end of the list (until 10 left)
+    for match in reversed(g.matches[:]):
+        if len(g.matches) > 10:
+            g.matches.remove(match)
 
 @app.route("/qr")
 def qr():
