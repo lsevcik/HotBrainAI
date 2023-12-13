@@ -24,6 +24,7 @@
 }
 
 #aboutus{
+    color: rgb(228, 228, 228)7);
     font-size: 30px;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
@@ -60,6 +61,7 @@
     padding-bottom: 258px;
     opacity: .75;
     transition: background-color 1.5s;
+    transition: width 1.5s;
 }
 
 #next:hover{
